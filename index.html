@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Motorpool Job Order System</title>
+<link rel="stylesheet" href="style.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<!-- ==================== LOGIN PAGE ==================== -->
+<div id="login-page" class="login-bg">
+  <div class="login-card">
+    <div class="login-icon">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M14 2H6C5.47 2 4.96 2.21 4.59 2.59 4.21 2.96 4 3.47 4 4v16c0 .53.21 1.04.59 1.41.37.37.88.59 1.41.59h12c.53 0 1.04-.21 1.41-.59.37-.37.59-.88.59-1.41V8L14 2z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <h1 class="login-title">Motorpool Job Order System</h1>
+    <p class="login-subtitle">Enter password to access dashboard</p>
+    <div class="login-form">
+      <label class="form-label">Password</label>
+      <input type="password" id="password" class="form-input" placeholder="Enter password" onkeydown="if(event.key==='Enter')handleLogin()"/>
+      <div id="login-error" class="login-error hidden">Incorrect password. Try again.</div>
+      <button class="btn-login" onclick="handleLogin()">Login</button>
+    </div>
+    <p class="demo-hint">Demo password: admin123</p>
+  </div>
+</div>
+
+<!-- ==================== DASHBOARD PAGE ==================== -->
+<div id="dashboard-page" class="hidden">
+  <nav class="navbar">
+    <div class="navbar-left">
+      <div class="nav-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M14 2H6C5.47 2 4.96 2.21 4.59 2.59 4.21 2.96 4 3.47 4 4v16c0 .53.21 1.04.59 1.41.37.37.88.59 1.41.59h12c.53 0 1.04-.21 1.41-.59.37-.37.59-.88.59-1.41V8L14 2z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2v6h6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div>
+        <div class="nav-title">Motorpool Job Orders</div>
+        <div class="nav-subtitle">Management Dashboard</div>
+      </div>
+    </div>
+    <div class="navbar-right">
+      <div class="notif-btn" onclick="openInbox()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <span class="notif-badge" id="inbox-badge">3</span>
+      </div>
+      <div class="user-info" onclick="toggleUserDropdown(event)" id="user-info-btn">
+        <div class="user-avatar">JD</div>
+        <div><div class="user-name">John Doe</div><div class="user-role">Motorpool Manager</div></div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div id="user-dropdown" class="user-dropdown hidden">
+        <button class="user-dropdown-item" onclick="openSettings()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Profile Settings
+        </button>
+        <div class="user-dropdown-divider"></div>
+        <button class="user-dropdown-item logout-item" onclick="handleLogout()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Logout
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="content-header">
+      <div>
+        <h2 class="section-title">Recent Job Orders</h2>
+        <p class="section-subtitle">Track and manage motorpool maintenance requests</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-filter" onclick="openFilterModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          Filter
+        </button>
+        <button class="btn-filter btn-batch-print" onclick="openBatchPrint()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Batch Print
+        </button>
+        <button class="btn-new" onclick="openNewJobOrder()">+ New Job Order</button>
+      </div>
+    </div>
+
+    <div class="job-list" id="job-list">
+      <!-- Card 1 -->
+      <div class="job-card" id="card-JO-2026-001" data-priority="urgent" data-status="approved" data-date="2026-04-28">
+        <div class="job-card-top">
+          <div class="job-left">
+            <div class="job-title-row"><h3 class="job-title">Engine Oil Change</h3><span class="badge badge-urgent">Urgent</span></div>
+            <p class="job-vehicle">Toyota Hilux - ABC 1234</p>
+            <p class="job-desc">Routine engine oil change and filter replacement</p>
+            <div class="job-meta">
+              <span class="meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>JO-2026-001</span>
+              <span class="meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Apr 28, 2026</span>
+            </div>
+          </div>
+          <div class="job-right"><span class="requisition-label">Material Requisition</span><span class="badge badge-approved" id="req-badge-JO-2026-001">Approved</span></div>
+        </div>
+        <div class="job-card-divider"></div>
+        <div class="job-actions">
+          <button class="btn-view" onclick="openViewModal('JO-2026-001','Engine Oil Change','Toyota Hilux - ABC 1234','urgent','April 28, 2026','Routine engine oil change and filter replacement','April 28, 2026')">View Details</button>
+          <button class="btn-update" onclick="openUpdateModal('JO-2026-001','Engine Oil Change')">Update Status</button>
+          <button class="btn-priority" onclick="openChangePriority('JO-2026-001','Engine Oil Change')">Change Priority</button>
+        </div>
+      </div>
+      <!-- Card 2 -->
+      <div class="job-card" id="card-JO-2026-002" data-priority="urgent" data-status="processing" data-date="2026-04-27">
+        <div class="job-card-top">
+          <div class="job-left">
+            <div class="job-title-row"><h3 class="job-title">Brake Pad Replacement</h3><span class="badge badge-urgent">Urgent</span></div>
+            <p class="job-vehicle">Isuzu D-Max - XYZ 5678</p>
+            <p class="job-desc">Front and rear brake pad replacement needed</p>
+            <div class="job-meta">
+              <span class="meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>JO-2026-002</span>
+              <span class="meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Apr 27, 2026</span>
+            </div>
+          </div>
+          <div class="job-right"><span class="requisition-label">Material Requisition</span><span class="badge badge-processing" id="req-badge-JO-2026-002">Processing</span></div>
+        </div>
+        <div class="job-card-divider"></div>
+        <div class="job-actions">
+          <button class="btn-view" onclick="openViewModal('JO-2026-002','Brake Pad Replacement','Isuzu D-Max - XYZ 5678','urgent','April 27, 2026','Front and rear brake pad replacement needed','April 27, 2026')">View Details</button>
+          <button class="btn-update" onclick="openUpdateModal('JO-2026-002','Brake Pad Replacement')">Update Status</button>
+          <button class="btn-priority" onclick="openChangePriority('JO-2026-002','Brake Pad Replacement')">Change Priority</button>
+        </div>
+      </div>
+      <!-- Card 3 -->
+      <div class="job-card" id="card-JO-2026-003" data-priority="noturgent" data-status="completed" data-date="2026-04-26">
+        <div class="job-card-top">
+          <div class="job-left">
+            <div class="job-title-row"><h3 class="job-title">Tire Rotation</h3><span class="badge badge-doable">Not Urgent</span></div>
+            <p class="job-vehicle">Mitsubishi L300 - DEF 9012</p>
+            <p class="job-desc">Regular tire rotation service</p>
+            <div class="job-meta">
+              <span class="meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>JO-2026-003</span>
+              <span class="meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Apr 26, 2026</span>
+            </div>
+          </div>
+          <div class="job-right"><span class="requisition-label">Material Requisition</span><span class="badge badge-completed" id="req-badge-JO-2026-003">Completed</span></div>
+        </div>
+        <div class="job-card-divider"></div>
+        <div class="job-actions">
+          <button class="btn-view" onclick="openViewModal('JO-2026-003','Tire Rotation','Mitsubishi L300 - DEF 9012','noturgent','April 26, 2026','Regular tire rotation service','April 26, 2026')">View Details</button>
+          <button class="btn-update" onclick="openUpdateModal('JO-2026-003','Tire Rotation')">Update Status</button>
+          <button class="btn-priority" onclick="openChangePriority('JO-2026-003','Tire Rotation')">Change Priority</button>
+        </div>
+      </div>
+      <!-- Card 4 -->
+      <div class="job-card" id="card-JO-2026-004" data-priority="noturgent" data-status="pending" data-date="2026-04-25">
+        <div class="job-card-top">
+          <div class="job-left">
+            <div class="job-title-row"><h3 class="job-title">Air Conditioning Repair</h3><span class="badge badge-doable">Not Urgent</span></div>
+            <p class="job-vehicle">Ford Ranger - GHI 3456</p>
+            <p class="job-desc">AC not cooling properly, needs diagnostic check</p>
+            <div class="job-meta">
+              <span class="meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>JO-2026-004</span>
+              <span class="meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Apr 25, 2026</span>
+            </div>
+          </div>
+          <div class="job-right"><span class="requisition-label">Material Requisition</span><span class="badge badge-pending" id="req-badge-JO-2026-004">Pending</span></div>
+        </div>
+        <div class="job-card-divider"></div>
+        <div class="job-actions">
+          <button class="btn-view" onclick="openViewModal('JO-2026-004','Air Conditioning Repair','Ford Ranger - GHI 3456','noturgent','April 25, 2026','AC not cooling properly, needs diagnostic check','April 25, 2026')">View Details</button>
+          <button class="btn-update" onclick="openUpdateModal('JO-2026-004','Air Conditioning Repair')">Update Status</button>
+          <button class="btn-priority" onclick="openChangePriority('JO-2026-004','Air Conditioning Repair')">Change Priority</button>
+        </div>
+      </div>
+    </div>
+    <div id="no-results" class="no-results hidden"><p>No job orders match the selected filters.</p></div>
+  </div>
+</div>
+
+<!-- ==================== SETTINGS PAGE ==================== -->
+<div id="settings-page" class="hidden">
+  <nav class="navbar settings-navbar">
+    <div class="navbar-left">
+      <button class="settings-back-btn" onclick="closeSettings()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div><div class="nav-title">Settings</div><div class="nav-subtitle">Manage your account preferences</div></div>
+    </div>
+  </nav>
+  <div class="settings-content">
+    <div class="settings-card">
+      <h3 class="settings-card-title">Account Information</h3>
+      <p class="settings-card-sub">View your account details</p>
+      <div class="settings-account-row">
+        <div class="settings-avatar">JD</div>
+        <div><p class="settings-name">John Doe</p><p class="settings-role">Motorpool Manager</p><p class="settings-email">john.doe@motorpool.com</p></div>
+      </div>
+    </div>
+    <div class="settings-card">
+      <h3 class="settings-card-title">Change Password</h3>
+      <p class="settings-card-sub">Update your password to keep your account secure</p>
+      <div class="settings-field"><label class="settings-label">Current Password <span class="req-star">*</span></label><input type="password" id="s-current-pw" class="settings-input" placeholder="Enter current password"/></div>
+      <div class="settings-field"><label class="settings-label">New Password <span class="req-star">*</span></label><input type="password" id="s-new-pw" class="settings-input" placeholder="Enter new password"/></div>
+      <div class="settings-field"><label class="settings-label">Verify New Password <span class="req-star">*</span></label><input type="password" id="s-verify-pw" class="settings-input" placeholder="Re-enter new password"/></div>
+      <div id="pw-error" class="settings-msg settings-msg-error hidden"></div>
+      <div id="pw-success" class="settings-msg settings-msg-success hidden">Password updated successfully!</div>
+      <button class="btn-apply-pw" onclick="applyNewPassword()">Apply New Password</button>
+    </div>
+    <div class="settings-card">
+      <h3 class="settings-card-title">Preferences</h3>
+      <p class="settings-card-sub">Customize your experience</p>
+      <div class="pref-row">
+        <div><p class="pref-title">Email Notifications</p><p class="pref-sub">Receive updates about job orders</p><p class="pref-count hidden" id="email-notif-count"></p></div>
+        <label class="toggle-switch"><input type="checkbox" id="pref-email" checked onchange="updatePreferences()"/><span class="toggle-slider"></span></label>
+      </div>
+      <div class="pref-divider"></div>
+      <div class="pref-row">
+        <div><p class="pref-title">Push Notifications</p><p class="pref-sub">Get notified about urgent requests</p><p class="pref-count hidden" id="push-notif-count"></p></div>
+        <label class="toggle-switch"><input type="checkbox" id="pref-push" checked onchange="updatePreferences()"/><span class="toggle-slider"></span></label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== FILTER MODAL ==================== -->
+<div id="filter-overlay" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('filter-overlay')">
+  <div class="modal-box filter-modal-box">
+    <div class="modal-header"><div><h2 class="modal-title">Filter Job Orders</h2><p class="modal-id">Apply filters to narrow down results</p></div><button class="modal-close" onclick="closeModal('filter-overlay')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-divider"></div>
+    <div class="modal-body filter-body">
+      <div class="filter-section"><h4 class="filter-section-title">Date Range</h4><div class="filter-date-row"><div class="filter-date-group"><label class="filter-date-label">From</label><input type="date" id="filter-date-from" class="filter-date-input"/></div><div class="filter-date-group"><label class="filter-date-label">To</label><input type="date" id="filter-date-to" class="filter-date-input"/></div></div></div>
+      <div class="filter-section"><h4 class="filter-section-title">Priority Level</h4><div class="filter-btn-group" id="priority-group"><button class="filter-option-btn active" data-value="all" onclick="selectFilterOption('priority-group',this)">All</button><button class="filter-option-btn" data-value="urgent" onclick="selectFilterOption('priority-group',this)">Urgent</button><button class="filter-option-btn" data-value="noturgent" onclick="selectFilterOption('priority-group',this)">Not Urgent</button></div></div>
+      <div class="filter-section"><h4 class="filter-section-title">Material Requisition Status</h4><div class="filter-btn-group filter-btn-grid" id="status-group"><button class="filter-option-btn active" data-value="all" onclick="selectFilterOption('status-group',this)">All</button><button class="filter-option-btn" data-value="pending" onclick="selectFilterOption('status-group',this)">Pending</button><button class="filter-option-btn" data-value="approved" onclick="selectFilterOption('status-group',this)">Approved</button><button class="filter-option-btn" data-value="processing" onclick="selectFilterOption('status-group',this)">Processing</button><button class="filter-option-btn" data-value="completed" onclick="selectFilterOption('status-group',this)">Completed</button></div></div>
+    </div>
+    <div class="modal-divider"></div>
+    <div class="modal-footer"><button class="btn-update modal-close-btn" onclick="resetFilters()">Reset Filters</button><button class="btn-view" onclick="applyFilters()">Apply Filters</button></div>
+  </div>
+</div>
+
+<!-- ==================== UPDATE STATUS MODAL ==================== -->
+<div id="update-overlay" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('update-overlay')">
+  <div class="modal-box update-modal-box">
+    <div class="modal-header"><div><h2 class="modal-title">Update Material Requisition Status</h2><p class="modal-id" id="update-modal-subtitle"></p></div><button class="modal-close" onclick="closeModal('update-overlay')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-divider"></div>
+    <div class="modal-body update-body">
+      <h4 class="modal-section-title">Select New Status</h4>
+      <p class="update-hint">Choose the new material requisition status for this job order.</p>
+      <div class="status-option-grid">
+        <div class="status-option status-opt-pending" id="opt-pending" onclick="selectStatus('pending')"><div class="status-opt-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><p class="status-opt-title">Pending</p><p class="status-opt-sub">Awaiting approval</p></div><span class="status-check-icon hidden"><svg width="18" height="18" viewBox="0 0 24 24" fill="#2563eb"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5l-4-4 1.41-1.41L10 13.67l6.59-6.59L18 8.5l-8 8z"/></svg></span></div>
+        <div class="status-option status-opt-approved" id="opt-approved" onclick="selectStatus('approved')"><div class="status-opt-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div><p class="status-opt-title">Approved</p><p class="status-opt-sub">Materials approved</p></div><span class="status-check-icon hidden"><svg width="18" height="18" viewBox="0 0 24 24" fill="#2563eb"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5l-4-4 1.41-1.41L10 13.67l6.59-6.59L18 8.5l-8 8z"/></svg></span></div>
+        <div class="status-option status-opt-processing" id="opt-processing" onclick="selectStatus('processing')"><div class="status-opt-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></div><div><p class="status-opt-title">Processing</p><p class="status-opt-sub">Currently processing</p></div><span class="status-check-icon hidden"><svg width="18" height="18" viewBox="0 0 24 24" fill="#2563eb"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5l-4-4 1.41-1.41L10 13.67l6.59-6.59L18 8.5l-8 8z"/></svg></span></div>
+        <div class="status-option status-opt-completed" id="opt-completed" onclick="selectStatus('completed')"><div class="status-opt-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div><p class="status-opt-title">Completed</p><p class="status-opt-sub">Work completed</p></div><span class="status-check-icon hidden"><svg width="18" height="18" viewBox="0 0 24 24" fill="#2563eb"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5l-4-4 1.41-1.41L10 13.67l6.59-6.59L18 8.5l-8 8z"/></svg></span></div>
+      </div>
+      <div class="update-note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div><span class="update-note-title">Note: </span>Updating the status will notify relevant team members and update the job order timeline.</div></div>
+    </div>
+    <div class="modal-divider"></div>
+    <div class="modal-footer"><button class="btn-update modal-close-btn" onclick="closeModal('update-overlay')">Cancel</button><button class="btn-view btn-disabled" id="btn-update-status" onclick="applyStatusUpdate()" disabled>Update Status</button></div>
+  </div>
+</div>
+
+<!-- ==================== CHANGE PRIORITY MODAL ==================== -->
+<div id="priority-overlay" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('priority-overlay')">
+  <div class="modal-box update-modal-box">
+    <div class="modal-header"><div><h2 class="modal-title">Change Priority Level</h2><p class="modal-id" id="priority-modal-subtitle"></p></div><button class="modal-close" onclick="closeModal('priority-overlay')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-divider"></div>
+    <div class="modal-body update-body">
+      <h4 class="modal-section-title">Select Priority Level</h4>
+      <p class="update-hint">Choose the priority level for this job order.</p>
+      <div class="status-option-grid">
+        <div class="status-option status-opt-urgent-prio" id="prio-opt-urgent" onclick="selectPriorityChange('urgent')"><div class="status-opt-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e85d5d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div><p class="status-opt-title">Urgent</p><p class="status-opt-sub">Requires immediate attention</p></div><span class="status-check-icon hidden"><svg width="18" height="18" viewBox="0 0 24 24" fill="#2563eb"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5l-4-4 1.41-1.41L10 13.67l6.59-6.59L18 8.5l-8 8z"/></svg></span></div>
+        <div class="status-option status-opt-noturgent-prio" id="prio-opt-noturgent" onclick="selectPriorityChange('noturgent')"><div class="status-opt-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div><p class="status-opt-title">Not Urgent</p><p class="status-opt-sub">Can be scheduled normally</p></div><span class="status-check-icon hidden"><svg width="18" height="18" viewBox="0 0 24 24" fill="#2563eb"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5l-4-4 1.41-1.41L10 13.67l6.59-6.59L18 8.5l-8 8z"/></svg></span></div>
+      </div>
+      <div class="update-note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div><span class="update-note-title">Note: </span>Changing the priority will update how this job order is displayed.</div></div>
+    </div>
+    <div class="modal-divider"></div>
+    <div class="modal-footer"><button class="btn-update modal-close-btn" onclick="closeModal('priority-overlay')">Cancel</button><button class="btn-view btn-disabled" id="btn-apply-priority" onclick="applyPriorityChange()" disabled>Apply Priority</button></div>
+  </div>
+</div>
+
+<!-- ==================== VIEW DETAILS MODAL ==================== -->
+<div id="modal-overlay" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('modal-overlay')">
+  <div class="modal-box" id="modal-box">
+    <div class="modal-header"><div><h2 class="modal-title">Job Order Details</h2><p class="modal-id" id="modal-id"></p></div><button class="modal-close" onclick="closeModal('modal-overlay')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-divider"></div>
+    <div class="modal-body">
+      <div class="modal-banner"><div class="modal-banner-left"><h3 class="modal-banner-title" id="modal-banner-title"></h3><p class="modal-banner-vehicle" id="modal-banner-vehicle"></p></div><span class="badge" id="modal-banner-badge"></span></div>
+      <h4 class="modal-section-title">Job Order Information</h4>
+      <div class="modal-info-grid"><div class="modal-info-cell"><span class="info-label">Job Order ID</span><span class="info-value" id="modal-info-id"></span></div><div class="modal-info-cell"><span class="info-label">Date</span><span class="info-value" id="modal-info-date"></span></div><div class="modal-info-cell"><span class="info-label">Vehicle</span><span class="info-value" id="modal-info-vehicle"></span></div><div class="modal-info-cell"><span class="info-label">Priority Level</span><span class="badge" id="modal-info-priority"></span></div></div>
+      <h4 class="modal-section-title">Material Requisition Status</h4>
+      <div class="modal-status-box"><div class="modal-status-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><span class="info-label">Current Status</span><div style="margin-top:6px"><span class="badge" id="modal-req-status"></span></div></div></div>
+      <h4 class="modal-section-title">Description</h4>
+      <div class="modal-desc-box"><p id="modal-desc"></p></div>
+      <h4 class="modal-section-title">Timeline</h4>
+      <div class="modal-timeline"><div class="timeline-item"><span class="timeline-dot dot-blue"></span><div><p class="timeline-event">Job Order Created</p><p class="timeline-date" id="modal-timeline-created"></p></div></div><div class="timeline-item"><span class="timeline-dot dot-green"></span><div><p class="timeline-event" id="modal-timeline-status-label"></p><p class="timeline-date">Recent</p></div></div></div>
+      <div class="modal-divider"></div>
+      <div class="modal-footer"><button class="btn-update modal-close-btn" onclick="closeModal('modal-overlay')">Close</button><button class="btn-view" onclick="window.print()">Print Details</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== NEW JOB ORDER MODAL ==================== -->
+<div id="new-jo-overlay" class="njo-overlay hidden" onclick="if(event.target===this)closeNewJobOrder()">
+  <div class="njo-box" id="njo-box">
+    <div class="modal-header"><div><h2 class="modal-title">New Job Order</h2><p class="modal-id">Fill in the details below to create a new job order</p></div><button class="modal-close" onclick="closeNewJobOrder()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-divider"></div>
+    <div class="njo-body">
+      <div id="njo-form-error" class="settings-msg settings-msg-error hidden"></div>
+      <div class="njo-grid-2">
+        <div class="settings-field"><label class="settings-label">Project/Department <span class="req-star">*</span></label><input type="text" id="njo-dept" class="settings-input" placeholder="Enter project or department"/></div>
+        <div class="settings-field"><label class="settings-label">Location <span class="req-star">*</span></label><input type="text" id="njo-location" class="settings-input" placeholder="Enter location"/></div>
+      </div>
+      <div class="njo-grid-2">
+        <div class="settings-field"><label class="settings-label">Date Requested <span class="req-star">*</span></label><input type="date" id="njo-date-req" class="settings-input"/></div>
+        <div class="settings-field"><label class="settings-label">Date Required <span class="req-star">*</span></label><input type="date" id="njo-date-reqd" class="settings-input"/></div>
+      </div>
+      <div class="njo-grid-2">
+        <div class="settings-field"><label class="settings-label">Item Code <span class="req-star">*</span></label><input type="text" id="njo-item-code" class="settings-input" placeholder="Enter item code"/></div>
+        <div class="settings-field"><label class="settings-label">U/M (Unit of Measurement) <span class="req-star">*</span></label><select id="njo-uom" class="settings-input njo-select"><option value="">Select unit</option><option value="UNIT">UNIT</option><option value="PCS">PCS</option><option value="SET">SET</option><option value="BOX">BOX</option><option value="LITER">LITER</option><option value="KG">KG</option><option value="METER">METER</option><option value="ROLL">ROLL</option></select></div>
+      </div>
+      <div class="settings-field"><label class="settings-label">Item Description <span class="req-star">*</span></label><textarea id="njo-desc" class="settings-input njo-textarea" placeholder="Enter detailed item description"></textarea></div>
+      <div class="settings-field"><label class="settings-label">Purpose/Pay Item <span class="req-star">*</span></label><textarea id="njo-purpose" class="settings-input njo-textarea" placeholder="Enter purpose or pay item details"></textarea></div>
+      <div class="njo-grid-2">
+        <div class="settings-field"><label class="settings-label">Quantity (QTY) <span class="req-star">*</span></label><input type="number" id="njo-qty" class="settings-input njo-qty-input" placeholder="Enter quantity" min="1"/></div>
+        <div class="settings-field"><label class="settings-label">Priority Level <span class="req-star">*</span></label>
+          <div class="priority-toggle-row">
+            <button type="button" class="priority-toggle-btn" id="prio-btn-urgent" onclick="selectPriority('urgent')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Urgent</button>
+            <button type="button" class="priority-toggle-btn" id="prio-btn-noturgent" onclick="selectPriority('noturgent')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Not Urgent</button>
+          </div>
+          <p class="priority-hint" id="prio-hint">Select the urgency level for this job order.</p>
+        </div>
+      </div>
+    </div>
+    <div class="modal-divider"></div>
+    <div class="modal-footer"><button class="btn-update modal-close-btn" onclick="closeNewJobOrder()">Cancel</button><button class="btn-view" onclick="continueToReview()">Continue to Review</button></div>
+  </div>
+</div>
+
+<!-- ==================== CONFIRM JOB ORDER MODAL ==================== -->
+<div id="confirm-jo-overlay" class="njo-overlay hidden" onclick="if(event.target===this)closeConfirmJobOrder()">
+  <div class="njo-box" id="confirm-jo-box">
+    <div class="modal-header"><div><h2 class="modal-title">Confirm Job Order</h2><p class="modal-id">Please review the information before submitting</p></div><button class="modal-close" onclick="closeConfirmJobOrder()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-divider"></div>
+    <div class="njo-body">
+      <div class="review-banner"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div><p class="review-banner-title">Review Your Information</p><p class="review-banner-sub">Please verify that all the information below is correct before submitting your job order.</p></div></div>
+      <div class="njo-grid-2"><div class="modal-info-cell"><span class="info-label">Project/Department</span><span class="info-value" id="rv-dept"></span></div><div class="modal-info-cell"><span class="info-label">Location</span><span class="info-value" id="rv-location"></span></div></div>
+      <div class="njo-grid-2"><div class="modal-info-cell"><span class="info-label">Date Requested</span><span class="info-value" id="rv-date-req"></span></div><div class="modal-info-cell"><span class="info-label">Date Required</span><span class="info-value" id="rv-date-reqd"></span></div></div>
+      <div class="njo-grid-2"><div class="modal-info-cell"><span class="info-label">Item Code</span><span class="info-value" id="rv-item-code"></span></div><div class="modal-info-cell"><span class="info-label">Unit of Measurement</span><span class="info-value" id="rv-uom"></span></div></div>
+      <div class="njo-grid-2"><div class="modal-info-cell"><span class="info-label">Quantity</span><span class="info-value" id="rv-qty"></span></div><div class="modal-info-cell"><span class="info-label">Priority Level</span><span class="badge" id="rv-priority"></span></div></div>
+      <div class="modal-info-cell"><span class="info-label">Item Description</span><span class="info-value" id="rv-desc"></span></div>
+      <div class="modal-info-cell"><span class="info-label">Purpose/Pay Item</span><span class="info-value" id="rv-purpose"></span></div>
+    </div>
+    <div class="modal-divider"></div>
+    <div class="modal-footer"><button class="btn-update modal-close-btn" onclick="goBackToEdit()">Go Back to Edit</button><button class="btn-view" onclick="submitJobOrder()">Confirm &amp; Submit Job Order</button></div>
+  </div>
+</div>
+
+<!-- ==================== BATCH PRINT PANEL ==================== -->
+<div id="batch-print-panel" class="bp-panel hidden">
+  <div class="bp-inner">
+    <div class="bp-header"><div><h2 class="bp-title">Batch Print</h2><p class="bp-subtitle">Select job orders to include in print</p></div><button class="modal-close" onclick="closeBatchPrint()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="bp-toolbar">
+      <div class="bp-search-wrap"><svg class="bp-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="bp-search" class="bp-search-input" placeholder="Search job orders…" oninput="renderBatchList()"/></div>
+      <button class="btn-filter bp-filter-btn" onclick="openBpFilterModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Filter</button>
+    </div>
+    <div id="bp-filter-chips" class="bp-filter-chips hidden"></div>
+    <div class="bp-divider"></div>
+    <div class="bp-selected-bar"><span id="bp-selected-count">0 selected</span><button class="bp-clear-btn" onclick="clearBpSelection()">Clear All</button></div>
+    <div class="bp-list" id="bp-list"></div>
+    <div id="bp-empty" class="bp-empty hidden"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p>No job orders match your search.</p></div>
+    <div class="bp-footer"><button class="bp-cancel-btn" onclick="closeBatchPrint()">Cancel</button><button class="bp-print-btn bp-print-btn-disabled" id="bp-print-btn" onclick="executeBatchPrint()" disabled><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Batch Print (<span id="bp-print-count">0</span>)</button></div>
+  </div>
+</div>
+
+<!-- BP Filter Modal -->
+<div id="bp-filter-overlay" class="modal-overlay hidden" onclick="if(event.target===this)closeModal('bp-filter-overlay')">
+  <div class="modal-box filter-modal-box">
+    <div class="modal-header"><div><h2 class="modal-title">Filter Job Orders</h2><p class="modal-id">Apply filters to narrow down results</p></div><button class="modal-close" onclick="closeModal('bp-filter-overlay')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-divider"></div>
+    <div class="modal-body filter-body">
+      <div class="filter-section"><h4 class="filter-section-title">Date Range</h4><div class="filter-date-row"><div class="filter-date-group"><label class="filter-date-label">From</label><input type="date" id="bp-filter-date-from" class="filter-date-input"/></div><div class="filter-date-group"><label class="filter-date-label">To</label><input type="date" id="bp-filter-date-to" class="filter-date-input"/></div></div></div>
+      <div class="filter-section"><h4 class="filter-section-title">Priority Level</h4><div class="filter-btn-group" id="bp-priority-group"><button class="filter-option-btn active" data-value="all" onclick="selectFilterOption('bp-priority-group',this)">All</button><button class="filter-option-btn" data-value="urgent" onclick="selectFilterOption('bp-priority-group',this)">Urgent</button><button class="filter-option-btn" data-value="noturgent" onclick="selectFilterOption('bp-priority-group',this)">Not Urgent</button></div></div>
+      <div class="filter-section"><h4 class="filter-section-title">Material Requisition Status</h4><div class="filter-btn-group filter-btn-grid" id="bp-status-group"><button class="filter-option-btn active" data-value="all" onclick="selectFilterOption('bp-status-group',this)">All</button><button class="filter-option-btn" data-value="pending" onclick="selectFilterOption('bp-status-group',this)">Pending</button><button class="filter-option-btn" data-value="approved" onclick="selectFilterOption('bp-status-group',this)">Approved</button><button class="filter-option-btn" data-value="processing" onclick="selectFilterOption('bp-status-group',this)">Processing</button><button class="filter-option-btn" data-value="completed" onclick="selectFilterOption('bp-status-group',this)">Completed</button></div></div>
+    </div>
+    <div class="modal-divider"></div>
+    <div class="modal-footer"><button class="btn-update modal-close-btn" onclick="resetBpFilters()">Reset Filters</button><button class="btn-view" onclick="applyBpFilters()">Apply Filters</button></div>
+  </div>
+</div>
+
+<!-- ==================== INBOX PANEL ==================== -->
+<div id="inbox-panel" class="inbox-panel hidden">
+  <div class="inbox-header"><div><h2 class="inbox-title">Inbox</h2><p class="inbox-unread-count" id="inbox-unread-label">0 unread messages</p></div><button class="modal-close" onclick="closeInbox()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+  <div class="inbox-toolbar"><button class="inbox-tool-btn" onclick="markAllRead()">Mark All as Read</button><button class="inbox-tool-btn" onclick="markAllUnread()">Mark All as Unread</button><button class="inbox-tool-btn" id="unread-toggle-btn" onclick="toggleUnreadFilter()">Unread Only</button></div>
+  <div class="inbox-divider"></div>
+  <div class="inbox-body" id="inbox-body">
+    <div class="inbox-category"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><div><p class="inbox-cat-title">Warehouse Replies (4)</p><p class="inbox-cat-sub">Messages from warehouse regarding your job orders</p></div></div>
+    <div id="inbox-messages-list"></div>
+    <div id="inbox-empty" class="inbox-empty hidden"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><p>No unread messages</p></div>
+  </div>
+  <div class="inbox-divider"></div>
+  <div class="inbox-footer"><button class="inbox-view-all" onclick="showAllMessages()">View All Messages</button></div>
+</div>
+
+<!-- ==================== MESSAGE VIEW PANEL ==================== -->
+<div id="message-panel" class="inbox-panel hidden">
+  <div class="inbox-header"><h2 class="inbox-title">Message</h2><button class="modal-close" onclick="closeMessagePanel()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+  <div class="inbox-divider"></div>
+  <div class="inbox-body msg-view-body">
+    <button class="msg-back-btn" onclick="closeMessagePanel()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back to Inbox</button>
+    <h3 class="msg-view-title" id="msg-view-title"></h3>
+    <div class="msg-view-meta"><span class="msg-view-sender" id="msg-view-sender"></span><span class="badge badge-warehouse" id="msg-view-tag-type"></span><span class="badge badge-jo" id="msg-view-tag-jo"></span></div>
+    <p class="msg-view-time" id="msg-view-time"></p>
+    <button class="inbox-tool-btn" onclick="markCurrentMessageUnread()">Mark as Unread</button>
+    <div class="msg-view-body-content" id="msg-view-content"></div>
+  </div>
+</div>
+
+<!-- ==================== SCRIPT ==================== -->
+<script>
+// ============================================================
+// STATE
+// ============================================================
+var currentPassword = 'admin123';
+
+var cardStatuses = {
+  'JO-2026-001':'approved','JO-2026-002':'processing',
+  'JO-2026-003':'completed','JO-2026-004':'pending'
+};
+var cardPriorities = {
+  'JO-2026-001':'urgent','JO-2026-002':'urgent',
+  'JO-2026-003':'noturgent','JO-2026-004':'noturgent'
+};
+
+var statusLabels = {pending:'Pending',approved:'Approved',processing:'Processing',completed:'Completed'};
+var statusBadgeClass = {pending:'badge-pending',approved:'badge-approved',processing:'badge-processing',completed:'badge-completed'};
+var priorityBadgeClass = {urgent:'badge-urgent',noturgent:'badge-doable'};
+var priorityLabel = {urgent:'Urgent',noturgent:'Not Urgent'};
+
+var njoCounter = 4;
+var njoPriority = null;
+
+// ============================================================
+// LOGIN / LOGOUT
+// ============================================================
+function handleLogin() {
+  var val = document.getElementById('password').value;
+  var err = document.getElementById('login-error');
+  if (val === currentPassword) {
+    document.getElementById('login-page').classList.add('hidden');
+    document.getElementById('dashboard-page').classList.remove('hidden');
+    err.classList.add('hidden');
+    updateBadge();
+  } else {
+    err.classList.remove('hidden');
+  }
+}
+
+function handleLogout() {
+  ['dashboard-page','settings-page','inbox-panel','message-panel','batch-print-panel'].forEach(function(id){
+    document.getElementById(id).classList.add('hidden');
+  });
+  document.getElementById('login-page').classList.remove('hidden');
+  document.getElementById('password').value = '';
+  document.getElementById('login-error').classList.add('hidden');
+  document.getElementById('user-dropdown').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+// ============================================================
+// USER DROPDOWN
+// ============================================================
+function toggleUserDropdown(e) {
+  e.stopPropagation();
+  document.getElementById('user-dropdown').classList.toggle('hidden');
+}
+document.addEventListener('click', function(){
+  var dd = document.getElementById('user-dropdown');
+  if (dd) dd.classList.add('hidden');
+});
+
+// ============================================================
+// MODAL HELPERS
+// ============================================================
+function closeModal(id) {
+  document.getElementById(id).classList.add('hidden');
+  document.body.style.overflow = '';
+}
+function openOverlay(overlayId, boxId) {
+  document.getElementById(overlayId).classList.remove('hidden');
+  var box = document.getElementById(boxId);
+  if (box) box.scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+}
+document.addEventListener('keydown', function(e){
+  if (e.key !== 'Escape') return;
+  ['modal-overlay','filter-overlay','update-overlay','priority-overlay','bp-filter-overlay'].forEach(function(id){
+    if (!document.getElementById(id).classList.contains('hidden')) closeModal(id);
+  });
+});
+
+// ============================================================
+// FILTER MODAL
+// ============================================================
+function selectFilterOption(groupId, btn) {
+  document.querySelectorAll('#' + groupId + ' .filter-option-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+}
+function openFilterModal() { openOverlay('filter-overlay',''); }
+function applyFilters() {
+  var pv = document.querySelector('#priority-group .filter-option-btn.active').dataset.value;
+  var sv = document.querySelector('#status-group .filter-option-btn.active').dataset.value;
+  var df = document.getElementById('filter-date-from').value;
+  var dt = document.getElementById('filter-date-to').value;
+  var any = false;
+  document.querySelectorAll('.job-card').forEach(function(c){
+    var pm = pv==='all'||c.dataset.priority===pv;
+    var sm = sv==='all'||c.dataset.status===sv;
+    var fm = !df||c.dataset.date>=df;
+    var tm = !dt||c.dataset.date<=dt;
+    if (pm&&sm&&fm&&tm){c.style.display='';any=true;}else c.style.display='none';
+  });
+  document.getElementById('no-results').classList.toggle('hidden',any);
+  closeModal('filter-overlay');
+}
+function resetFilters() {
+  document.getElementById('filter-date-from').value='';
+  document.getElementById('filter-date-to').value='';
+  document.querySelectorAll('#priority-group .filter-option-btn').forEach(function(b,i){b.classList.toggle('active',i===0);});
+  document.querySelectorAll('#status-group .filter-option-btn').forEach(function(b,i){b.classList.toggle('active',i===0);});
+  document.querySelectorAll('.job-card').forEach(function(c){c.style.display='';});
+  document.getElementById('no-results').classList.add('hidden');
+  closeModal('filter-overlay');
+}
+
+// ============================================================
+// VIEW DETAILS MODAL
+// ============================================================
+function openViewModal(id, title, vehicle, priority, date, desc, createdDate) {
+  var status = cardStatuses[id] || 'pending';
+  var label  = statusLabels[status];
+  document.getElementById('modal-id').textContent = id;
+  document.getElementById('modal-banner-title').textContent = title;
+  document.getElementById('modal-banner-vehicle').textContent = vehicle;
+  document.getElementById('modal-info-id').textContent = id;
+  document.getElementById('modal-info-date').textContent = date;
+  document.getElementById('modal-info-vehicle').textContent = vehicle;
+  document.getElementById('modal-desc').textContent = desc;
+  document.getElementById('modal-timeline-created').textContent = createdDate;
+  document.getElementById('modal-timeline-status-label').textContent = 'Status Updated to ' + label;
+  var pb = document.getElementById('modal-banner-badge');
+  pb.className = 'badge ' + (priorityBadgeClass[priority]||'badge-doable');
+  pb.textContent = priorityLabel[priority]||priority;
+  var pi = document.getElementById('modal-info-priority');
+  pi.className = 'badge ' + (priorityBadgeClass[priority]||'badge-doable');
+  pi.textContent = priorityLabel[priority]||priority;
+  var rb = document.getElementById('modal-req-status');
+  rb.className = 'badge ' + (statusBadgeClass[status]||'');
+  rb.textContent = label;
+  openOverlay('modal-overlay','modal-box');
+}
+
+// ============================================================
+// UPDATE STATUS MODAL
+// ============================================================
+var currentUpdateId = null;
+var selectedStatus  = null;
+
+function openUpdateModal(id, name) {
+  currentUpdateId = id; selectedStatus = null;
+  document.getElementById('update-modal-subtitle').textContent = id + ' - ' + name;
+  ['pending','approved','processing','completed'].forEach(function(s){
+    var el = document.getElementById('opt-'+s);
+    el.classList.remove('selected-opt');
+    el.querySelector('.status-check-icon').classList.add('hidden');
+  });
+  var btn = document.getElementById('btn-update-status');
+  btn.disabled=true; btn.classList.add('btn-disabled');
+  openOverlay('update-overlay','');
+}
+function selectStatus(s) {
+  selectedStatus = s;
+  ['pending','approved','processing','completed'].forEach(function(x){
+    var el=document.getElementById('opt-'+x);
+    el.classList.remove('selected-opt');
+    el.querySelector('.status-check-icon').classList.add('hidden');
+  });
+  document.getElementById('opt-'+s).classList.add('selected-opt');
+  document.getElementById('opt-'+s).querySelector('.status-check-icon').classList.remove('hidden');
+  var btn=document.getElementById('btn-update-status');
+  var same = s===(cardStatuses[currentUpdateId]||'pending');
+  btn.disabled=same; btn.classList.toggle('btn-disabled',same);
+}
+function applyStatusUpdate() {
+  if (!selectedStatus||!currentUpdateId) return;
+  cardStatuses[currentUpdateId]=selectedStatus;
+  var b=document.getElementById('req-badge-'+currentUpdateId);
+  b.className='badge '+statusBadgeClass[selectedStatus];
+  b.textContent=statusLabels[selectedStatus];
+  document.getElementById('card-'+currentUpdateId).dataset.status=selectedStatus;
+  closeModal('update-overlay');
+}
+
+// ============================================================
+// CHANGE PRIORITY MODAL
+// ============================================================
+var currentPriorityId=null; var selectedPriorityVal=null;
+
+function openChangePriority(id, name) {
+  currentPriorityId=id; selectedPriorityVal=null;
+  document.getElementById('priority-modal-subtitle').textContent=id+' - '+name;
+  ['urgent','noturgent'].forEach(function(p){
+    var el=document.getElementById('prio-opt-'+p);
+    el.classList.remove('selected-opt');
+    el.querySelector('.status-check-icon').classList.add('hidden');
+  });
+  var btn=document.getElementById('btn-apply-priority');
+  btn.disabled=true; btn.classList.add('btn-disabled');
+  openOverlay('priority-overlay','');
+}
+function selectPriorityChange(val) {
+  selectedPriorityVal=val;
+  ['urgent','noturgent'].forEach(function(p){
+    var el=document.getElementById('prio-opt-'+p);
+    el.classList.remove('selected-opt');
+    el.querySelector('.status-check-icon').classList.add('hidden');
+  });
+  document.getElementById('prio-opt-'+val).classList.add('selected-opt');
+  document.getElementById('prio-opt-'+val).querySelector('.status-check-icon').classList.remove('hidden');
+  var current=cardPriorities[currentPriorityId]||document.getElementById('card-'+currentPriorityId).dataset.priority;
+  var btn=document.getElementById('btn-apply-priority');
+  var same=val===current; btn.disabled=same; btn.classList.toggle('btn-disabled',same);
+}
+function applyPriorityChange() {
+  if (!selectedPriorityVal||!currentPriorityId) return;
+  cardPriorities[currentPriorityId]=selectedPriorityVal;
+  var card=document.getElementById('card-'+currentPriorityId);
+  card.dataset.priority=selectedPriorityVal;
+  var b=card.querySelector('.job-title-row .badge');
+  if(b){b.className='badge '+(priorityBadgeClass[selectedPriorityVal]||'badge-doable');b.textContent=priorityLabel[selectedPriorityVal];}
+  closeModal('priority-overlay');
+}
+
+// ============================================================
+// NEW JOB ORDER
+// ============================================================
+function openNewJobOrder() {
+  document.getElementById('njo-date-req').value=new Date().toISOString().split('T')[0];
+  document.getElementById('njo-form-error').classList.add('hidden');
+  document.getElementById('new-jo-overlay').classList.remove('hidden');
+  document.getElementById('njo-box').scrollTop=0;
+  document.body.style.overflow='hidden';
+}
+function closeNewJobOrder() {
+  document.getElementById('new-jo-overlay').classList.add('hidden');
+  document.body.style.overflow='';
+}
+function closeConfirmJobOrder() {
+  document.getElementById('confirm-jo-overlay').classList.add('hidden');
+  document.body.style.overflow='';
+}
+function selectPriority(val) {
+  njoPriority=val;
+  document.getElementById('prio-btn-urgent').classList.remove('prio-active-urgent');
+  document.getElementById('prio-btn-noturgent').classList.remove('prio-active-noturgent');
+  document.getElementById('prio-btn-'+val).classList.add('prio-active-'+val);
+  var hint=document.getElementById('prio-hint');
+  if(val==='urgent'){hint.textContent='⚠ Marked as Urgent — this will be prioritized immediately.';hint.style.color='#e85d5d';}
+  else{hint.textContent='✓ Marked as Not Urgent — will be scheduled normally.';hint.style.color='#6366f1';}
+}
+function formatDateForDisplay(v) {
+  if(!v) return '';
+  var p=v.split('-'); if(p.length!==3) return v;
+  var m=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return m[parseInt(p[1],10)-1]+' '+parseInt(p[2],10)+', '+p[0];
+}
+function continueToReview() {
+  var dept=document.getElementById('njo-dept').value.trim();
+  var loc=document.getElementById('njo-location').value.trim();
+  var dr=document.getElementById('njo-date-req').value;
+  var drd=document.getElementById('njo-date-reqd').value;
+  var code=document.getElementById('njo-item-code').value.trim();
+  var uom=document.getElementById('njo-uom').value;
+  var desc=document.getElementById('njo-desc').value.trim();
+  var purpose=document.getElementById('njo-purpose').value.trim();
+  var qty=document.getElementById('njo-qty').value.trim();
+  var err=document.getElementById('njo-form-error');
+  if(!dept||!loc||!dr||!drd||!code||!uom||!desc||!purpose||!qty||!njoPriority){
+    err.textContent='Please fill in all required fields before continuing.';
+    err.classList.remove('hidden');
+    document.getElementById('njo-box').scrollTop=0;
+    return;
+  }
+  err.classList.add('hidden');
+  document.getElementById('rv-dept').textContent=dept;
+  document.getElementById('rv-location').textContent=loc;
+  document.getElementById('rv-date-req').textContent=formatDateForDisplay(dr);
+  document.getElementById('rv-date-reqd').textContent=formatDateForDisplay(drd);
+  document.getElementById('rv-item-code').textContent=code;
+  document.getElementById('rv-uom').textContent=uom;
+  document.getElementById('rv-qty').textContent=qty;
+  document.getElementById('rv-desc').textContent=desc;
+  document.getElementById('rv-purpose').textContent=purpose;
+  var rp=document.getElementById('rv-priority');
+  rp.className='badge '+(njoPriority==='urgent'?'badge-urgent':'badge-doable');
+  rp.textContent=njoPriority==='urgent'?'Urgent':'Not Urgent';
+  document.getElementById('new-jo-overlay').classList.add('hidden');
+  document.getElementById('confirm-jo-overlay').classList.remove('hidden');
+  document.getElementById('confirm-jo-box').scrollTop=0;
+}
+function goBackToEdit() {
+  document.getElementById('confirm-jo-overlay').classList.add('hidden');
+  document.getElementById('new-jo-overlay').classList.remove('hidden');
+  document.getElementById('njo-box').scrollTop=0;
+}
+function submitJobOrder() {
+  njoCounter++;
+  var newId='JO-2026-'+String(njoCounter).padStart(3,'0');
+  var dept=document.getElementById('njo-dept').value.trim();
+  var loc=document.getElementById('njo-location').value.trim();
+  var dateReq=document.getElementById('njo-date-req').value;
+  var desc=document.getElementById('njo-desc').value.trim();
+  var purpose=document.getElementById('njo-purpose').value.trim();
+  var priority=njoPriority;
+  var displayDate=formatDateForDisplay(dateReq);
+  cardStatuses[newId]='pending';
+  cardPriorities[newId]=priority;
+  var sd=desc.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  var sl=(dept+' — '+loc).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  var sp=purpose.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  var isU=priority==='urgent';
+  var html='<div class="job-card" id="card-'+newId+'" data-priority="'+priority+'" data-status="pending" data-date="'+dateReq+'">'
+    +'<div class="job-card-top"><div class="job-left">'
+    +'<div class="job-title-row"><h3 class="job-title">'+desc+'</h3><span class="badge '+(isU?'badge-urgent':'badge-doable')+'">'+(isU?'Urgent':'Not Urgent')+'</span></div>'
+    +'<p class="job-vehicle">'+dept+' — '+loc+'</p>'
+    +'<p class="job-desc">'+purpose+'</p>'
+    +'<div class="job-meta">'
+    +'<span class="meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'+newId+'</span>'
+    +'<span class="meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'+displayDate+'</span>'
+    +'</div></div>'
+    +'<div class="job-right"><span class="requisition-label">Material Requisition</span>'
+    +'<span class="badge badge-pending" id="req-badge-'+newId+'">Pending</span></div></div>'
+    +'<div class="job-card-divider"></div>'
+    +'<div class="job-actions">'
+    +'<button class="btn-view" onclick="openViewModal(\''+newId+'\',\''+sd+'\',\''+sl+'\',\''+priority+'\',\''+displayDate+'\',\''+sp+'\',\''+displayDate+'\')">View Details</button>'
+    +'<button class="btn-update" onclick="openUpdateModal(\''+newId+'\',\''+sd+'\')">Update Status</button>'
+    +'<button class="btn-priority" onclick="openChangePriority(\''+newId+'\',\''+sd+'\')">Change Priority</button>'
+    +'</div></div>';
+  document.getElementById('job-list').insertAdjacentHTML('afterbegin',html);
+  ['njo-dept','njo-location','njo-date-reqd','njo-item-code','njo-desc','njo-purpose','njo-qty'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('njo-uom').value='';
+  njoPriority=null;
+  document.getElementById('prio-btn-urgent').classList.remove('prio-active-urgent');
+  document.getElementById('prio-btn-noturgent').classList.remove('prio-active-noturgent');
+  document.getElementById('prio-hint').textContent='Select the urgency level for this job order.';
+  document.getElementById('prio-hint').style.color='#888';
+  document.getElementById('no-results').classList.add('hidden');
+  document.getElementById('confirm-jo-overlay').classList.add('hidden');
+  document.getElementById('new-jo-overlay').classList.add('hidden');
+  document.body.style.overflow='';
+}
+
+// ============================================================
+// SETTINGS
+// ============================================================
+function openSettings() {
+  document.getElementById('user-dropdown').classList.add('hidden');
+  document.getElementById('dashboard-page').classList.add('hidden');
+  document.getElementById('settings-page').classList.remove('hidden');
+  ['s-current-pw','s-new-pw','s-verify-pw'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('pw-error').classList.add('hidden');
+  document.getElementById('pw-success').classList.add('hidden');
+  updatePreferences();
+}
+function closeSettings() {
+  document.getElementById('settings-page').classList.add('hidden');
+  document.getElementById('dashboard-page').classList.remove('hidden');
+}
+function applyNewPassword() {
+  var curr=document.getElementById('s-current-pw').value.trim();
+  var npw=document.getElementById('s-new-pw').value.trim();
+  var vpw=document.getElementById('s-verify-pw').value.trim();
+  var err=document.getElementById('pw-error');
+  var suc=document.getElementById('pw-success');
+  err.classList.add('hidden'); suc.classList.add('hidden');
+  if(!curr||!npw||!vpw){err.textContent='All fields are required.';err.classList.remove('hidden');return;}
+  if(curr!==currentPassword){err.textContent='Current password is incorrect.';err.classList.remove('hidden');return;}
+  if(npw.length<6){err.textContent='New password must be at least 6 characters.';err.classList.remove('hidden');return;}
+  if(npw!==vpw){err.textContent='New passwords do not match.';err.classList.remove('hidden');return;}
+  currentPassword=npw;
+  suc.classList.remove('hidden');
+  ['s-current-pw','s-new-pw','s-verify-pw'].forEach(function(id){document.getElementById(id).value='';});
+}
+function updatePreferences() {
+  var emailOn=document.getElementById('pref-email').checked;
+  var pushOn=document.getElementById('pref-push').checked;
+  var total=inboxMessages.length;
+  var unread=getUnreadCount();
+  var ec=document.getElementById('email-notif-count');
+  if(emailOn){ec.textContent='You have '+total+' email'+(total!==1?'s':'')+' in your inbox ('+unread+' unread).';ec.classList.remove('hidden');}else ec.classList.add('hidden');
+  var pc=document.getElementById('push-notif-count');
+  if(pushOn){pc.textContent=unread>0?unread+' unread notification'+(unread!==1?'s':'')+' pending.':'No pending push notifications.';pc.classList.remove('hidden');}else pc.classList.add('hidden');
+  var badge=document.getElementById('inbox-badge');
+  badge.style.display=(emailOn&&unread>0)?'flex':'none';
+}
+
+// ============================================================
+// INBOX
+// ============================================================
+var inboxMessages=[
+  {id:1,read:false,title:'RE: JO-2026-002 - Material Available',sender:'Warehouse Department',tagType:'Warehouse',tagJo:'JO-2026-002',time:'10 mins ago',preview:'Brake pads for Isuzu D-Max are now in stock. We can proceed with the installation. Estimated completion: 2 days.',fullBody:'Dear Motorpool Manager,\n\nThis is to inform you that the requested materials for Job Order JO-2026-002 (Brake Pad Replacement - Isuzu D-Max) are now available in our warehouse.\n\nDetails:\n- Item: Brake Pads (Front & Rear Set)\n- Quantity: 2 sets\n- Brand: Premium Grade\n- Location: Warehouse Bay 3, Shelf B-12\n\nWe can proceed with the installation as requested. Our technician is available and the estimated completion time is 2 days from the start date.\n\nPlease confirm the installation schedule at your earliest convenience.\n\nBest regards,\nWarehouse Department'},
+  {id:2,read:false,title:'RE: JO-2026-005 - Battery Order Confirmed',sender:'Warehouse Department',tagType:'Warehouse',tagJo:'JO-2026-005',time:'45 mins ago',preview:'Battery for Nissan Navara has been ordered from supplier. Expected arrival: April 30, 2026. Will notify upon receipt.',fullBody:'Dear Motorpool Manager,\n\nWe have successfully placed the order for the battery needed for Job Order JO-2026-005 (Nissan Navara - Battery Replacement).\n\nOrder Details:\n- Item: Automotive Battery 12V\n- Supplier: AutoParts Central\n- Expected Arrival: April 30, 2026\n- Order Reference: PO-2026-0089\n\nWe will notify you immediately upon receipt of the items so that the installation can be scheduled.\n\nThank you for your patience.\n\nBest regards,\nWarehouse Department'},
+  {id:3,read:false,title:'Job Order JO-2026-001 Completed',sender:'Maintenance Team',tagType:null,tagJo:'JO-2026-001',time:'2 hrs ago',preview:'Engine oil change for Toyota Hilux has been completed. Please review and close the job order.',fullBody:'Dear Motorpool Manager,\n\nThis is to inform you that Job Order JO-2026-001 (Engine Oil Change - Toyota Hilux ABC 1234) has been completed successfully.\n\nWork Summary:\n- Engine oil drained and replaced with SAE 10W-40\n- Oil filter replaced\n- Visual inspection completed — no additional issues found\n- Vehicle returned to motorpool bay\n\nPlease review the job order and update the status to Completed at your earliest convenience.\n\nBest regards,\nMaintenance Team'},
+  {id:4,read:false,title:'RE: JO-2026-003 - Material Delay',sender:'Warehouse Department',tagType:'Warehouse',tagJo:'JO-2026-003',time:'Yesterday',preview:'The tire rotation service materials are delayed. New estimated delivery: May 2, 2026. Apologies for the inconvenience.',fullBody:'Dear Motorpool Manager,\n\nWe regret to inform you that there is a delay in the delivery of materials required for Job Order JO-2026-003 (Tire Rotation - Mitsubishi L300 DEF 9012).\n\nReason for Delay: Supplier backlog due to increased demand.\n\nRevised Schedule:\n- New Estimated Delivery: May 2, 2026\n- Updated ETA will be sent once confirmed by supplier\n\nWe sincerely apologize for the inconvenience this may cause.\n\nBest regards,\nWarehouse Department'},
+  {id:5,read:true,title:'Weekly Inventory Update',sender:'Admin Office',tagType:null,tagJo:null,time:'2 days ago',preview:'Please review the upcoming maintenance schedule for next week and confirm availability.',fullBody:'Dear Motorpool Manager,\n\nThis is your weekly inventory and maintenance schedule update.\n\nUpcoming Maintenance:\n- Monday: Toyota Hilux — scheduled PMS\n- Wednesday: Ford Ranger — AC follow-up\n- Friday: Isuzu D-Max — brake inspection\n\nPlease review the schedule and confirm the availability of vehicles and technicians.\n\nBest regards,\nAdmin Office'}
+];
+var showingUnreadOnly=false;
+var currentMessageId=null;
+
+function getUnreadCount(){return inboxMessages.filter(function(m){return !m.read;}).length;}
+function updateBadge(){
+  var c=getUnreadCount();
+  var b=document.getElementById('inbox-badge');
+  b.textContent=c;
+  b.style.display=c>0?'flex':'none';
+  var ul=document.getElementById('inbox-unread-label');
+  if(ul)ul.textContent=c+' unread message'+(c!==1?'s':'');
+}
+function renderInboxMessages(){
+  var q=(document.getElementById('bp-search')?'':'');
+  var msgs=showingUnreadOnly?inboxMessages.filter(function(m){return !m.read;}):inboxMessages;
+  var list=document.getElementById('inbox-messages-list');
+  var empty=document.getElementById('inbox-empty');
+  if(msgs.length===0){list.innerHTML='';empty.classList.remove('hidden');return;}
+  empty.classList.add('hidden');
+  list.innerHTML=msgs.map(function(msg){
+    return '<div class="inbox-msg-item '+(msg.read?'msg-read':'msg-unread')+'" onclick="openMessage('+msg.id+')">'
+      +'<div class="inbox-msg-top"><span class="inbox-msg-title">'+msg.title+'</span><span class="inbox-msg-time">'+msg.time+'</span></div>'
+      +'<div class="inbox-msg-meta"><span class="inbox-msg-sender">'+msg.sender+'</span>'
+      +(msg.tagType?'<span class="badge badge-warehouse">'+msg.tagType+'</span>':'')
+      +(msg.tagJo?'<span class="badge badge-jo">'+msg.tagJo+'</span>':'')
+      +'</div>'
+      +'<p class="inbox-msg-preview">'+msg.preview+'</p>'
+      +'<div class="inbox-msg-divider"></div></div>';
+  }).join('');
+}
+function openInbox(){
+  document.getElementById('inbox-panel').classList.remove('hidden');
+  document.getElementById('message-panel').classList.add('hidden');
+  showingUnreadOnly=false;
+  document.getElementById('unread-toggle-btn').textContent='Unread Only';
+  document.getElementById('unread-toggle-btn').classList.remove('active-toggle');
+  updateBadge();
+  renderInboxMessages();
+}
+function closeInbox(){document.getElementById('inbox-panel').classList.add('hidden');document.getElementById('message-panel').classList.add('hidden');}
+function openMessage(id){
+  var msg=inboxMessages.find(function(m){return m.id===id;});
+  if(!msg)return;
+  msg.read=true; currentMessageId=id; updateBadge();
+  document.getElementById('msg-view-title').textContent=msg.title;
+  document.getElementById('msg-view-sender').textContent=msg.sender;
+  document.getElementById('msg-view-time').textContent=msg.time;
+  var tt=document.getElementById('msg-view-tag-type');
+  if(msg.tagType){tt.textContent=msg.tagType;tt.classList.remove('hidden');}else tt.classList.add('hidden');
+  var tj=document.getElementById('msg-view-tag-jo');
+  if(msg.tagJo){tj.textContent=msg.tagJo;tj.classList.remove('hidden');}else tj.classList.add('hidden');
+  document.getElementById('msg-view-content').innerHTML=msg.fullBody.split('\n').map(function(l){return l===''?'<br>':'<p>'+l+'</p>';}).join('');
+  document.getElementById('inbox-panel').classList.add('hidden');
+  document.getElementById('message-panel').classList.remove('hidden');
+}
+function closeMessagePanel(){document.getElementById('message-panel').classList.add('hidden');renderInboxMessages();updateBadge();document.getElementById('inbox-panel').classList.remove('hidden');}
+function markCurrentMessageUnread(){var msg=inboxMessages.find(function(m){return m.id===currentMessageId;});if(msg){msg.read=false;updateBadge();}}
+function markAllRead(){inboxMessages.forEach(function(m){m.read=true;});updateBadge();renderInboxMessages();}
+function markAllUnread(){inboxMessages.forEach(function(m){m.read=false;});updateBadge();renderInboxMessages();}
+function toggleUnreadFilter(){
+  showingUnreadOnly=!showingUnreadOnly;
+  var btn=document.getElementById('unread-toggle-btn');
+  btn.textContent=showingUnreadOnly?'Show All':'Unread Only';
+  btn.classList.toggle('active-toggle',showingUnreadOnly);
+  renderInboxMessages();
+}
+function showAllMessages(){showingUnreadOnly=false;document.getElementById('unread-toggle-btn').textContent='Unread Only';document.getElementById('unread-toggle-btn').classList.remove('active-toggle');renderInboxMessages();}
+
+// ============================================================
+// BATCH PRINT
+// ============================================================
+var bpSelected=new Set();
+var bpFilters={priority:'all',status:'all',dateFrom:'',dateTo:''};
+
+function getJobOrdersData(){
+  var cards=document.querySelectorAll('#job-list .job-card');
+  var data=[];
+  cards.forEach(function(c){
+    var id=c.id.replace('card-','');
+    var te=c.querySelector('.job-title'); var ve=c.querySelector('.job-vehicle');
+    var de=c.querySelector('.job-desc'); var mi=c.querySelectorAll('.meta-item');
+    var be=c.querySelector('.job-title-row .badge'); var rb=c.querySelector('.job-right .badge');
+    data.push({id:id,title:te?te.textContent.trim():'',vehicle:ve?ve.textContent.trim():'',desc:de?de.textContent.trim():'',
+      joId:mi[0]?mi[0].textContent.trim():id,date:mi[1]?mi[1].textContent.trim():'',rawDate:c.dataset.date||'',
+      priority:c.dataset.priority||'noturgent',status:c.dataset.status||'pending',
+      priorityLabel:be?be.textContent.trim():'',statusLabel:rb?rb.textContent.trim():''});
+  });
+  return data;
+}
+function openBatchPrint(){
+  bpSelected.clear();
+  document.getElementById('bp-search').value='';
+  bpFilters={priority:'all',status:'all',dateFrom:'',dateTo:''};
+  renderBatchList(); updateBpCount();
+  document.getElementById('bp-filter-chips').classList.add('hidden');
+  document.getElementById('bp-filter-chips').innerHTML='';
+  document.getElementById('batch-print-panel').classList.remove('hidden');
+}
+function closeBatchPrint(){document.getElementById('batch-print-panel').classList.add('hidden');}
+function renderBatchList(){
+  var q=(document.getElementById('bp-search').value||'').toLowerCase().trim();
+  var jobs=getJobOrdersData();
+  var listEl=document.getElementById('bp-list');
+  var emptyEl=document.getElementById('bp-empty');
+  var filtered=jobs.filter(function(j){
+    var ms=!q||j.title.toLowerCase().includes(q)||j.joId.toLowerCase().includes(q)||j.vehicle.toLowerCase().includes(q)||j.desc.toLowerCase().includes(q);
+    var mp=bpFilters.priority==='all'||j.priority===bpFilters.priority;
+    var mst=bpFilters.status==='all'||j.status===bpFilters.status;
+    var mf=!bpFilters.dateFrom||j.rawDate>=bpFilters.dateFrom;
+    var mt=!bpFilters.dateTo||j.rawDate<=bpFilters.dateTo;
+    return ms&&mp&&mst&&mf&&mt;
+  });
+  if(filtered.length===0){listEl.innerHTML='';emptyEl.classList.remove('hidden');return;}
+  emptyEl.classList.add('hidden');
+  listEl.innerHTML=filtered.map(function(j){
+    var isSel=bpSelected.has(j.id);
+    var pc=j.priority==='urgent'?'badge-urgent':'badge-doable';
+    var sc=statusBadgeClass[j.status]||'';
+    return '<div class="bp-item'+(isSel?' bp-item-selected':'')+'" id="bpitem-'+j.id+'">'
+      +'<div class="bp-item-info">'
+      +'<div class="bp-item-top"><span class="bp-item-title">'+j.title+'</span><span class="badge '+pc+' bp-badge-sm">'+j.priorityLabel+'</span></div>'
+      +'<p class="bp-item-vehicle">'+j.vehicle+'</p>'
+      +'<div class="bp-item-meta"><span class="bp-meta-text">'+j.joId+'</span><span class="bp-meta-sep">·</span><span class="bp-meta-text">'+j.date+'</span><span class="bp-meta-sep">·</span><span class="badge '+sc+' bp-badge-sm">'+j.statusLabel+'</span></div>'
+      +'</div>'
+      +'<button class="bp-select-btn'+(isSel?' bp-select-btn-on':'')+'" onclick="toggleBpItem(\''+j.id+'\')">'
+      +(isSel?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':'')
+      +'</button></div>';
+  }).join('');
+}
+function toggleBpItem(id){
+  if(bpSelected.has(id))bpSelected.delete(id);else bpSelected.add(id);
+  var jobs=getJobOrdersData();
+  var job=jobs.find(function(j){return j.id===id;});
+  if(!job)return;
+  var el=document.getElementById('bpitem-'+id);
+  if(!el)return;
+  var isSel=bpSelected.has(id);
+  el.classList.toggle('bp-item-selected',isSel);
+  var btn=el.querySelector('.bp-select-btn');
+  btn.classList.toggle('bp-select-btn-on',isSel);
+  btn.innerHTML=isSel?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':'';
+  updateBpCount();
+}
+function updateBpCount(){
+  var n=bpSelected.size;
+  document.getElementById('bp-selected-count').textContent=n+' selected';
+  document.getElementById('bp-print-count').textContent=n;
+  var btn=document.getElementById('bp-print-btn');
+  btn.disabled=n===0; btn.classList.toggle('bp-print-btn-disabled',n===0);
+}
+function clearBpSelection(){bpSelected.clear();renderBatchList();updateBpCount();}
+function openBpFilterModal(){
+  document.getElementById('bp-filter-date-from').value=bpFilters.dateFrom;
+  document.getElementById('bp-filter-date-to').value=bpFilters.dateTo;
+  ['bp-priority-group','bp-status-group'].forEach(function(g){
+    var k=g==='bp-priority-group'?'priority':'status';
+    document.querySelectorAll('#'+g+' .filter-option-btn').forEach(function(b){b.classList.toggle('active',b.dataset.value===bpFilters[k]);});
+  });
+  document.getElementById('bp-filter-overlay').classList.remove('hidden');
+}
+function applyBpFilters(){
+  bpFilters.priority=document.querySelector('#bp-priority-group .filter-option-btn.active').dataset.value;
+  bpFilters.status=document.querySelector('#bp-status-group .filter-option-btn.active').dataset.value;
+  bpFilters.dateFrom=document.getElementById('bp-filter-date-from').value;
+  bpFilters.dateTo=document.getElementById('bp-filter-date-to').value;
+  renderBatchList();updateBpFilterChips();closeModal('bp-filter-overlay');
+}
+function resetBpFilters(){
+  bpFilters={priority:'all',status:'all',dateFrom:'',dateTo:''};
+  document.getElementById('bp-filter-date-from').value='';
+  document.getElementById('bp-filter-date-to').value='';
+  document.querySelectorAll('#bp-priority-group .filter-option-btn').forEach(function(b,i){b.classList.toggle('active',i===0);});
+  document.querySelectorAll('#bp-status-group .filter-option-btn').forEach(function(b,i){b.classList.toggle('active',i===0);});
+  renderBatchList();updateBpFilterChips();closeModal('bp-filter-overlay');
+}
+function updateBpFilterChips(){
+  var chips=[];
+  if(bpFilters.priority!=='all')chips.push(bpFilters.priority==='urgent'?'Urgent':'Not Urgent');
+  if(bpFilters.status!=='all')chips.push(statusLabels[bpFilters.status]||bpFilters.status);
+  if(bpFilters.dateFrom)chips.push('From: '+bpFilters.dateFrom);
+  if(bpFilters.dateTo)chips.push('To: '+bpFilters.dateTo);
+  var el=document.getElementById('bp-filter-chips');
+  if(chips.length===0){el.classList.add('hidden');el.innerHTML='';}
+  else{el.classList.remove('hidden');el.innerHTML=chips.map(function(c){return '<span class="bp-chip">'+c+'</span>';}).join('');}
+}
+function executeBatchPrint(){
+  if(bpSelected.size===0)return;
+  var jobs=getJobOrdersData();
+  var sel=jobs.filter(function(j){return bpSelected.has(j.id);});
+  var h='<!DOCTYPE html><html><head><title>Batch Job Order Print</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#111}h1{font-size:20px;margin-bottom:4px}.subtitle{font-size:13px;color:#888;margin-bottom:24px}.jo-block{border:1px solid #ddd;border-radius:8px;padding:18px;margin-bottom:20px;page-break-inside:avoid}.jo-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}.jo-title{font-size:16px;font-weight:700}.jo-badge{font-size:12px;padding:3px 10px;border-radius:20px;font-weight:600}.badge-urgent{background:#fff0f0;color:#e85d5d;border:1px solid #ffd6d6}.badge-noturgent{background:#eef2ff;color:#6366f1;border:1px solid #c7d2fe}.jo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.jo-cell{background:#f9fafb;border-radius:6px;padding:8px 12px}.jo-label{font-size:11px;color:#aaa;margin-bottom:2px}.jo-val{font-size:13px;font-weight:600}.jo-desc{margin-top:10px;font-size:13px;color:#555}@media print{body{padding:0}}</style></head><body>'
+    +'<h1>Motorpool Job Orders — Batch Print</h1>'
+    +'<p class="subtitle">Printed: '+new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})+' · '+sel.length+' job order(s)</p>';
+  sel.forEach(function(j){
+    var pc=j.priority==='urgent'?'badge-urgent':'badge-noturgent';
+    h+='<div class="jo-block"><div class="jo-header"><span class="jo-title">'+j.title+'</span><span class="jo-badge '+pc+'">'+j.priorityLabel+'</span></div>'
+      +'<div class="jo-grid"><div class="jo-cell"><div class="jo-label">Job Order ID</div><div class="jo-val">'+j.joId+'</div></div>'
+      +'<div class="jo-cell"><div class="jo-label">Date</div><div class="jo-val">'+j.date+'</div></div>'
+      +'<div class="jo-cell"><div class="jo-label">Vehicle / Department</div><div class="jo-val">'+j.vehicle+'</div></div>'
+      +'<div class="jo-cell"><div class="jo-label">Material Requisition</div><div class="jo-val">'+j.statusLabel+'</div></div></div>'
+      +'<div class="jo-desc">'+j.desc+'</div></div>';
+  });
+  h+='</body></html>';
+  var win=window.open('','_blank');
+  win.document.write(h); win.document.close(); win.focus(); win.print();
+  closeBatchPrint();
+}
+</script>
+</body>
+</html>
