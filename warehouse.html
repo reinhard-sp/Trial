@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Warehouse Management System</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #10b981;
+      --green-dark: #059669;
+      --red: #ef4444;
+      --blue: #3b82f6;
+      --blue-light: #dbeafe;
+      --yellow-light: #fef3c7;
+      --gray-bg: #f8fafc;
+      --white: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --shadow: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+      --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif; background: var(--gray-bg); color: var(--text); min-height: 100vh; letter-spacing: -0.01em; }
+
+    /* LOGIN */
+    #login-page {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+    }
+    .login-card {
+      background: var(--white); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      padding: 48px 52px 44px; width: 440px; text-align: center; backdrop-filter: blur(10px);
+    }
+    .login-icon {
+      width: 64px; height: 64px; background: linear-gradient(135deg, var(--green), var(--green-dark)); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
+    }
+    .login-icon svg { width: 28px; height: 28px; fill: white; }
+    .login-card h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+    .login-card > p { color: var(--text-muted); font-size: 14px; margin-bottom: 28px; }
+    .form-label { display: block; text-align: left; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+    .form-input {
+      width: 100%; padding: 13px 16px; border: none; background: #f0f0f0;
+      border-radius: 8px; font-size: 14px; color: var(--text); margin-bottom: 16px; outline: none;
+    }
+    .form-input:focus { background: #e8e8e8; }
+    .btn-login {
+      width: 100%; padding: 14px; background: linear-gradient(135deg, var(--green), var(--green-dark)); color: white; border: none;
+      border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; margin-bottom: 16px; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4); }
+    .login-hint { color: var(--text-muted); font-size: 13px; }
+    .login-error { color: var(--red); font-size: 13px; margin-bottom: 10px; display: none; }
+
+    /* DASHBOARD */
+    #dashboard-page { display: none; }
+
+    .header {
+      background: var(--white); border-bottom: 1px solid var(--border); box-shadow: var(--shadow);
+      padding: 0 32px; height: 72px; display: flex; align-items: center;
+      justify-content: space-between; position: sticky; top: 0; z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-logo {
+      width: 48px; height: 48px; background: linear-gradient(135deg, var(--green), var(--green-dark)); border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
+    .header-logo svg { width: 20px; height: 20px; fill: white; }
+    .header-title h2 { font-size: 16px; font-weight: 700; }
+    .header-title p { font-size: 12px; color: var(--text-muted); }
+    .header-right { display: flex; align-items: center; gap: 20px; }
+    .notif-btn { position: relative; background: none; border: none; cursor: pointer; padding: 8px 12px; border-radius: 10px; transition: all 0.3s ease; }
+    .notif-btn:hover { background: rgba(59, 130, 246, 0.1); }
+    .notif-btn:focus { outline: none; background: rgba(59, 130, 246, 0.15); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+    .notif-btn svg { width: 24px; height: 24px; color: #555; display: block; transition: color 0.3s ease; }
+    .notif-btn:hover svg { color: var(--blue); }
+    .notif-badge {
+      position: absolute; top: -2px; right: -4px; background: var(--red); color: white;
+      border-radius: 50%; width: 18px; height: 18px; font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logout-btn {
+      display: flex; align-items: center; gap: 6px; background: none; border: none;
+      color: var(--red); font-size: 14px; font-weight: 600; cursor: pointer; padding: 8px 14px; border-radius: 10px; transition: all 0.3s ease;
+    }
+    .logout-btn:hover { background: rgba(239, 68, 68, 0.1); }
+    .logout-btn:focus { outline: none; background: rgba(239, 68, 68, 0.15); box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2); }
+    .logout-btn svg { width: 18px; height: 18px; }
+
+    .main { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+    .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 32px; }
+    .page-header h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+    .page-header p { color: var(--text-muted); font-size: 14px; }
+    .filter-btn {
+      display: flex; align-items: center; gap: 8px; background: var(--white);
+      border: 1px solid var(--border); border-radius: 10px; padding: 11px 20px;
+      font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.3s ease; box-shadow: var(--shadow);
+    }
+    .filter-btn:hover { background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
+
+    .section-header {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 16px; font-weight: 700; margin-bottom: 16px;
+    }
+    .section-header.urgent { color: var(--red); }
+    .section-header.standard { color: var(--blue); }
+    .section-header svg { width: 20px; height: 20px; }
+
+    .request-card {
+      background: var(--white); border-radius: 16px; border: 1px solid var(--border);
+      padding: 28px; margin-bottom: 20px;
+      display: grid; grid-template-columns: 1fr auto; gap: 0 24px; box-shadow: var(--shadow);
+      transition: all 0.3s ease;
+    }
+    .request-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+    .request-card.urgent-card { border-color: #fecaca; background: #fef2f2; }
+    .card-main { grid-column: 1; }
+    .card-actions { grid-column: 2; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+
+    .card-title-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .card-title { font-size: 17px; font-weight: 700; }
+    .badge { padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; }\n    .badge-urgent { background: #ffe0e0; color: var(--red); }\n    .badge-doable { background: #f3f4f6; color: #6b7280; border: 1px solid #d1d5db; }
+
+    .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; margin-bottom: 14px; }
+    .card-field label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 3px; }
+    .card-field span { font-size: 14px; font-weight: 600; }
+
+    .card-purpose { background: #f8f8f8; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: var(--text-muted); margin-bottom: 14px; }
+    .purpose-label { font-size: 12px; font-weight: 600; color: #999; margin-bottom: 4px; }
+
+    .card-meta { display: flex; align-items: center; gap: 20px; font-size: 12px; color: var(--text-muted); flex-wrap: wrap; }
+    .card-meta span { display: flex; align-items: center; gap: 5px; }
+    .card-meta svg { width: 14px; height: 14px; }
+    .card-meta .required { color: var(--red); font-weight: 600; }
+
+    .status-label { font-size: 12px; color: var(--text-muted); text-align: right; }
+    .status-badge { padding: 5px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; border: 1px solid transparent; }
+    .status-approved { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
+    .status-processing { background: #e3f0ff; color: var(--blue); border-color: #90caf9; }
+    .status-completed { border-color: #ccc; color: #444; }
+    .status-pending { background: var(--yellow-light); color: #e65100; border-color: #ffe082; }
+
+    .update-btn {
+      display: flex; align-items: center; gap: 7px; background: linear-gradient(135deg, var(--green), var(--green-dark)); color: white;
+      border: none; border-radius: 10px; padding: 12px 22px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    .update-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4); }
+    .update-btn svg { width: 15px; height: 15px; }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      z-index: 200; align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--white); border-radius: 12px; width: 90%; max-width: 650px; max-height: 90vh; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.18); display: flex; flex-direction: column; }
+    .modal-header { padding: 24px 28px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; flex-shrink: 0; }
+    .modal-header h3 { font-size: 20px; font-weight: 700; color: var(--text); }
+    .modal-header p { font-size: 14px; color: var(--text-muted); margin-top: 6px; }
+    .modal-close { background: none; border: none; cursor: pointer; font-size: 22px; color: #666; line-height: 1; padding: 0 4px; }
+    .modal-body { padding: 28px 28px; overflow-y: auto; flex: 1; }
+    .filter-section { margin-bottom: 26px; }
+    .filter-section h4 { font-size: 16px; font-weight: 700; margin-bottom: 14px; color: var(--text); }
+    .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .date-field label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
+    .date-input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; outline: none; }
+    .toggle-group { display: flex; flex-wrap: wrap; gap: 10px; }
+    .toggle-btn { padding: 10px 24px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; background: white; transition: all 0.3s ease; }
+    .toggle-btn.active { background: var(--blue-light); border-color: var(--blue); color: var(--blue); box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2); }
+    .modal-footer { padding: 20px 28px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 12px; background: #fafafa; flex-shrink: 0; }
+    .btn-reset { padding: 12px 28px; background: white; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; color: var(--text); transition: all 0.2s; }
+    .btn-reset:hover { background: #f5f5f5; border-color: #999; }
+    .btn-apply { padding: 12px 32px; background: linear-gradient(135deg, var(--blue), #1d4ed8); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+    .btn-apply:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4); }
+    .btn-apply:disabled { background: #ccc; cursor: not-allowed; opacity: 0.6; }
+
+    /* STATUS UPDATE MODAL */
+    .status-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 22px; }
+    .status-option {
+      min-height: 90px;
+      padding: 14px 16px 14px 14px;
+      border: 2px solid transparent;
+      border-radius: 14px;
+      cursor: pointer;
+      background: #f8fafc;
+      text-align: left;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      grid-template-rows: auto auto;
+      column-gap: 12px;
+      align-items: center;
+      box-shadow: var(--shadow);
+    }
+    .status-option:hover { 
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+    .status-option.selected {
+      border-color: #1565c0;
+      background: #e3f0ff;
+    }
+    .status-option.selected::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      width: 22px;
+      height: 22px;
+      background: #1565c0;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      transform: translateY(-50%);
+    }
+    .status-option-icon {
+      grid-column: 1;
+      grid-row: 1 / span 2;
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.72);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      line-height: 1;
+    }
+    .status-option-title {
+      grid-column: 2;
+      grid-row: 1;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 1px;
+      color: var(--text);
+      align-self: end;
+    }
+    .status-option-desc {
+      grid-column: 2;
+      grid-row: 2;
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.25;
+      align-self: start;
+    }
+    
+    /* Status option color themes */
+    .status-option[data-status="Pending"] { background: #fffce3; }
+    .status-option[data-status="Pending"]:hover { background: #fffbcc; }
+    .status-option[data-status="Pending"].selected { border-color: #f9a825; background: #fffbcc; }
+    
+    .status-option[data-status="Approved"] { background: #e8f5e9; }
+    .status-option[data-status="Approved"]:hover { background: #dcefd9; }
+    .status-option[data-status="Approved"].selected { border-color: #2e9e3e; background: #dcefd9; }
+    
+    .status-option[data-status="Processing"] { background: #e3f0ff; }
+    .status-option[data-status="Processing"]:hover { background: #cce5ff; }
+    .status-option[data-status="Processing"].selected { border-color: #1565c0; background: #cce5ff; }
+    
+    .status-option[data-status="Completed"] { background: #f0f0f0; }
+    .status-option[data-status="Completed"]:hover { background: #e8e8e8; }
+    .status-option[data-status="Completed"].selected { border-color: #666; background: #e8e8e8; }
+
+    .info-box {
+      background: #e3f0ff; border: 1px solid #90caf9; border-radius: 10px;
+      padding: 16px 18px; font-size: 13px; color: #1565c0; margin-bottom: 24px;
+      display: flex; gap: 12px; align-items: flex-start; line-height: 1.5;
+    }
+    .info-box svg { width: 20px; height: 20px; flex-shrink: 0; margin-top: 2px; stroke: #1565c0; }
+
+    /* ── INBOX PANEL ── */
+    .inbox-panel {
+      position: fixed; top: 0; right: 0; width: 440px; height: 100vh;
+      background: var(--white); box-shadow: -10px 0 30px rgba(0,0,0,0.15);
+      z-index: 300; display: flex; flex-direction: column;
+      transform: translateX(100%); transition: transform 0.3s ease;
+    }
+    .inbox-panel.open { transform: translateX(0); }
+
+    .inbox-header {
+      padding: 24px 24px 0;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .inbox-header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+    .inbox-header h3 { font-size: 20px; font-weight: 700; }
+    .inbox-header .unread-count { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+    .inbox-actions { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 16px; }
+    .inbox-action-btn {
+      padding: 7px 14px; border: 1px solid var(--border); border-radius: 8px;
+      background: white; font-size: 13px; font-weight: 500; cursor: pointer;
+    }
+    .inbox-action-btn:hover { background: #f0f0f0; }
+    .inbox-action-btn.active-filter { background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
+    .inbox-close { background: none; border: none; cursor: pointer; font-size: 24px; color: #666; line-height: 1; }
+
+    .inbox-body { flex: 1; overflow-y: auto; }
+
+    /* Section group */
+    .inbox-group-header {
+      display: flex; align-items: center; gap: 8px;
+      padding: 16px 24px 8px;
+      font-size: 15px; font-weight: 700; color: var(--green);
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .inbox-group-header svg { width: 18px; height: 18px; }
+    .inbox-group-sub { font-size: 12px; color: var(--green); font-weight: 400; padding: 4px 24px 12px; }
+
+    .inbox-item {
+      padding: 16px 24px; border-bottom: 1px solid #f5f5f5;
+      cursor: pointer; transition: background 0.15s;
+      background: #f9fef9;
+    }
+    .inbox-item:hover { background: #f0f9f1; }
+    .inbox-item.read { background: white; }
+    .inbox-item.read:hover { background: #f8f8f8; }
+
+    .inbox-item-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+    .inbox-item-title-row { display: flex; align-items: center; gap: 8px; }
+    .inbox-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--green); flex-shrink: 0; margin-top: 3px; }
+    .inbox-dot.hidden { visibility: hidden; }
+    .inbox-item-title { font-size: 14px; font-weight: 700; }
+    .inbox-item-time { font-size: 12px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
+
+    .inbox-item-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding-left: 17px; }
+    .inbox-dept { font-size: 12px; color: var(--text-muted); }
+    .inbox-mr-tag {
+      font-size: 11px; font-weight: 600; color: var(--blue);
+      background: var(--blue-light); border-radius: 12px; padding: 2px 8px;
+    }
+    .inbox-urgent-tag {
+      font-size: 11px; font-weight: 600; color: var(--red);
+      background: #ffe0e0; border-radius: 12px; padding: 2px 8px;
+    }
+    .inbox-item-body { font-size: 13px; color: var(--text-muted); line-height: 1.5; padding-left: 17px; }
+
+    .inbox-footer {
+      padding: 14px 24px; border-top: 1px solid var(--border); text-align: center; flex-shrink: 0;
+    }
+    .view-all-link { color: var(--green); font-size: 14px; font-weight: 600; cursor: pointer; background: none; border: none; }
+    .view-all-link:hover { text-decoration: underline; }
+
+    /* MESSAGE DETAIL VIEW */
+    .message-detail {
+      position: fixed; top: 0; right: 0; width: 440px; height: 100vh;
+      background: var(--white); box-shadow: -10px 0 30px rgba(0,0,0,0.15);
+      z-index: 301; display: flex; flex-direction: column;
+      transform: translateX(100%); transition: transform 0.3s ease;
+    }
+    .message-detail.open { transform: translateX(0); }
+
+    .msg-header {
+      padding: 20px 24px; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+    }
+    .msg-header h3 { font-size: 18px; font-weight: 700; }
+    .msg-close { background: none; border: none; cursor: pointer; font-size: 24px; color: #666; }
+
+    .msg-body { flex: 1; overflow-y: auto; padding: 20px 24px; }
+
+    .msg-back {
+      display: flex; align-items: center; gap: 6px;
+      color: var(--green); font-size: 14px; font-weight: 600;
+      background: none; border: none; cursor: pointer; margin-bottom: 20px; padding: 0;
+    }
+    .msg-back svg { width: 16px; height: 16px; }
+
+    .msg-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .msg-meta-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .msg-dept { font-size: 13px; color: var(--text-muted); }
+    .msg-time { font-size: 13px; color: var(--text-muted); margin-bottom: 14px; }
+    .msg-mark-btn {
+      padding: 8px 16px; border: 1px solid var(--border); border-radius: 8px;
+      background: white; font-size: 13px; font-weight: 500; cursor: pointer; margin-bottom: 20px;
+    }
+    .msg-mark-btn:hover { background: #f0f0f0; }
+    .msg-content {
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 20px; font-size: 14px; line-height: 1.7; color: var(--text);
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-page">
+  <div class="login-card">
+    <div class="login-icon">
+      <svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4.7-8 5.334L4 8.7V6l8 5.333L20 6v2.7z"/></svg>
+    </div>
+    <h1>Warehouse Management System</h1>
+    <p>Enter password to access dashboard</p>
+    <div id="login-error" class="login-error">Incorrect password. Try again.</div>
+    <label class="form-label" for="pw-input">Password</label>
+    <input id="pw-input" class="form-input" type="password" placeholder="Enter password" />
+    <button class="btn-login" onclick="doLogin()">Login</button>
+    <div class="login-hint">Demo password: warehouse123</div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard-page">
+  <header class="header">
+    <div class="header-left">
+      <div class="header-logo">
+        <svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4.7-8 5.334L4 8.7V6l8 5.333L20 6v2.7z"/></svg>
+      </div>
+      <div class="header-title">
+        <h2>Warehouse Dashboard</h2>
+        <p>Material Requisition Management</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="notif-btn" id="notif-btn" onclick="openInbox()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        <span class="notif-badge" id="notif-badge">3</span>
+      </button>
+      <button class="logout-btn" onclick="doLogout()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Logout
+      </button>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="page-header">
+      <div>
+        <h1>Material Requests</h1>
+        <p>Manage material requisitions from motorpool</p>
+      </div>
+      <button class="filter-btn" onclick="openFilter()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        Filter
+      </button>
+    </div>
+
+    <!-- URGENT -->
+    <div class="section-header urgent">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      Urgent Material Requests (3)
+    </div>
+
+    <div class="request-card urgent-card" data-job-order-id="MR-2026-001">
+      <div class="card-main">
+        <div class="card-title-row">
+          <span class="card-title">Synthetic Engine Oil 5W-30</span>
+          <span class="badge badge-urgent">Urgent</span>
+        </div>
+        <div class="card-grid">
+          <div class="card-field"><label>Item Code</label><span>OIL-5W30-SYN</span></div>
+          <div class="card-field"><label>Quantity</label><span>5 L</span></div>
+          <div class="card-field"><label>Vehicle</label><span>Toyota Hilux - ABC 1234</span></div>
+          <div class="card-field"><label>Requested By</label><span>John Doe</span></div>
+        </div>
+        <div class="card-purpose"><div class="purpose-label">Purpose</div>Routine engine oil change and filter replacement</div>
+        <div class="card-meta">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>MR-2026-001</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Requested: Apr 28, 2026</span>
+          <span class="required"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Required: May 1, 2026</span>
+        </div>
+      </div>
+      <div class="card-actions">
+        <div class="status-label">Current Status</div>
+        <span class="status-badge status-approved">Approved</span>
+        <button class="update-btn" onclick="openStatusModal('MR-2026-001', 'Engine Oil Change', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Update Status</button>
+      </div>
+    </div>
+
+    <div class="request-card urgent-card" data-job-order-id="MR-2026-002">
+      <div class="card-main">
+        <div class="card-title-row">
+          <span class="card-title">Brake Pads - Premium Grade</span>
+          <span class="badge badge-urgent">Urgent</span>
+        </div>
+        <div class="card-grid">
+          <div class="card-field"><label>Item Code</label><span>BRK-PAD-IDM-2026</span></div>
+          <div class="card-field"><label>Quantity</label><span>2 SET</span></div>
+          <div class="card-field"><label>Vehicle</label><span>Isuzu D-Max - XYZ 5678</span></div>
+          <div class="card-field"><label>Requested By</label><span>John Doe</span></div>
+        </div>
+        <div class="card-purpose"><div class="purpose-label">Purpose</div>Front and rear brake pad replacement needed</div>
+        <div class="card-meta">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>MR-2026-002</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Requested: Apr 27, 2026</span>
+          <span class="required"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Required: Apr 30, 2026</span>
+        </div>
+      </div>
+      <div class="card-actions">
+        <div class="status-label">Current Status</div>
+        <span class="status-badge status-processing">Processing</span>
+        <button class="update-btn" onclick="openStatusModal('MR-2026-002', 'Brake Pads', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Update Status</button>
+      </div>
+    </div>
+
+    <div class="request-card urgent-card" data-job-order-id="MR-2026-004">
+      <div class="card-main">
+        <div class="card-title-row">
+          <span class="card-title">Heavy-Duty Vehicle Battery 12V 100Ah</span>
+          <span class="badge badge-urgent">Urgent</span>
+        </div>
+        <div class="card-grid">
+          <div class="card-field"><label>Item Code</label><span>BAT-100-12V</span></div>
+          <div class="card-field"><label>Quantity</label><span>1 UNIT</span></div>
+          <div class="card-field"><label>Vehicle</label><span>Nissan Navara - JKL 7890</span></div>
+          <div class="card-field"><label>Requested By</label><span>John Doe</span></div>
+        </div>
+        <div class="card-purpose"><div class="purpose-label">Purpose</div>Battery showing signs of failure, immediate replacement needed</div>
+        <div class="card-meta">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>MR-2026-004</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Requested: Apr 25, 2026</span>
+          <span class="required"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Required: Apr 28, 2026</span>
+        </div>
+      </div>
+      <div class="card-actions">
+        <div class="status-label">Current Status</div>
+        <span class="status-badge status-approved">Approved</span>
+        <button class="update-btn" onclick="openStatusModal('MR-2026-004', 'Battery', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Update Status</button>
+      </div>
+    </div>
+
+    <!-- STANDARD -->
+    <div class="section-header standard" style="margin-top:8px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/>
+        <line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/>
+      </svg>
+      Standard Material Requests (2)
+    </div>
+
+    <div class="request-card" data-job-order-id="MR-2026-003">
+      <div class="card-main">
+        <div class="card-title-row">
+          <span class="card-title">Tire Balancing Weights</span>
+          <span class="badge badge-doable">Standard</span>
+        </div>
+        <div class="card-grid">
+          <div class="card-field"><label>Item Code</label><span>TIRE-BAL-WEIGHT</span></div>
+          <div class="card-field"><label>Quantity</label><span>4 SET</span></div>
+          <div class="card-field"><label>Vehicle</label><span>Mitsubishi L300 - DEF 9012</span></div>
+          <div class="card-field"><label>Requested By</label><span>John Doe</span></div>
+        </div>
+        <div class="card-purpose"><div class="purpose-label">Purpose</div>Regular tire rotation service</div>
+        <div class="card-meta">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>MR-2026-003</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Requested: Apr 26, 2026</span>
+          <span class="required"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Required: May 3, 2026</span>
+        </div>
+      </div>
+      <div class="card-actions">
+        <div class="status-label">Current Status</div>
+        <span class="status-badge status-completed">Completed</span>
+        <button class="update-btn" onclick="openStatusModal('MR-2026-003', 'Tire Weights', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Update Status</button>
+      </div>
+    </div>
+
+    <div class="request-card" data-job-order-id="MR-2026-005">
+      <div class="card-main">
+        <div class="card-title-row">
+          <span class="card-title">AC System Parts (Pending Diagnostic)</span>
+          <span class="badge badge-doable">Standard</span>
+        </div>
+        <div class="card-grid">
+          <div class="card-field"><label>Item Code</label><span>AC-PARTS-TBD</span></div>
+          <div class="card-field"><label>Quantity</label><span>1 SET</span></div>
+          <div class="card-field"><label>Vehicle</label><span>Ford Ranger - GHI 3456</span></div>
+          <div class="card-field"><label>Requested By</label><span>John Doe</span></div>
+        </div>
+        <div class="card-purpose"><div class="purpose-label">Purpose</div>AC system not cooling properly, needs diagnostic and part replacement</div>
+        <div class="card-meta">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>MR-2026-005</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Requested: Apr 24, 2026</span>
+          <span class="required"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Required: May 10, 2026</span>
+        </div>
+      </div>
+      <div class="card-actions">
+        <div class="status-label">Current Status</div>
+        <span class="status-badge status-pending">Pending</span>
+        <button class="update-btn" onclick="openStatusModal('MR-2026-005', 'AC System', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Update Status</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- INBOX PANEL -->
+<div class="inbox-panel" id="inbox-panel">
+  <div class="inbox-header">
+    <div class="inbox-header-top">
+      <h3>Motorpool Inbox</h3>
+      <button class="inbox-close" onclick="closeInbox()">×</button>
+    </div>
+    <div class="unread-count" id="unread-count-label">3 unread messages</div>
+    <div class="inbox-actions">
+      <button class="inbox-action-btn" onclick="markAllRead()">Mark All as Read</button>
+      <button class="inbox-action-btn" onclick="markAllUnread()">Mark All as Unread</button>
+      <button class="inbox-action-btn" id="unread-only-btn" onclick="toggleUnreadOnly()">Unread Only</button>
+    </div>
+  </div>
+  <div class="inbox-body" id="inbox-body">
+    <!-- rendered by JS -->
+  </div>
+  <div class="inbox-footer">
+    <button class="view-all-link">View All Messages</button>
+  </div>
+</div>
+
+<!-- MESSAGE DETAIL -->
+<div class="message-detail" id="message-detail">
+  <div class="msg-header">
+    <h3>Message</h3>
+    <button class="msg-close" onclick="closeMessage()">×</button>
+  </div>
+  <div class="msg-body" id="msg-body">
+  </div>
+</div>
+
+<!-- FILTER MODAL -->
+<div class="modal-overlay" id="filter-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div><h3>Filter Job Orders</h3><p>Apply filters to narrow down results</p></div>
+      <button class="modal-close" onclick="closeFilter()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="filter-section">
+        <h4>Date Range</h4>
+        <div class="date-row">
+          <div class="date-field"><label>From</label><input type="date" class="date-input"/></div>
+          <div class="date-field"><label>To</label><input type="date" class="date-input"/></div>
+        </div>
+      </div>
+      <div class="filter-section">
+        <h4>Priority Level</h4>
+        <div class="toggle-group" id="priority-group">
+          <button class="toggle-btn active" onclick="toggle(this,'priority-group')">All</button>
+          <button class="toggle-btn" onclick="toggle(this,'priority-group')">Urgent</button>
+          <button class="toggle-btn" onclick="toggle(this,'priority-group')">Standard</button>
+        </div>
+      </div>
+      <div class="filter-section">
+        <h4>Material Requisition Status</h4>
+        <div class="toggle-group" id="status-group">
+          <button class="toggle-btn active" onclick="toggle(this,'status-group')">All</button>
+          <button class="toggle-btn" onclick="toggle(this,'status-group')">Pending</button>
+          <button class="toggle-btn" onclick="toggle(this,'status-group')">Approved</button>
+          <button class="toggle-btn" onclick="toggle(this,'status-group')">Processing</button>
+          <button class="toggle-btn" onclick="toggle(this,'status-group')">Completed</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-reset" onclick="resetFilters()">Reset Filters</button>
+      <button class="btn-apply" onclick="closeFilter()">Apply Filters</button>
+    </div>
+  </div>
+</div>
+
+<!-- STATUS UPDATE MODAL -->
+<div class="modal-overlay" id="status-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <h3>Update Material Requisition Status</h3>
+        <p id="status-modal-subtitle"></p>
+      </div>
+      <button class="modal-close" onclick="closeStatusModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom: 18px;">
+        <h4 style="font-size: 15px; font-weight: 700; margin-bottom: 4px; line-height: 1.2;">Select New Status</h4>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.25;">Choose the new material requisition status for this job order.</p>
+        <div class="status-options">
+          <div class="status-option" data-status="Pending" onclick="selectStatus(this, 'Pending', '#ffe082')">
+            <div class="status-option-icon">⏱️</div>
+            <div class="status-option-title">Pending</div>
+            <div class="status-option-desc">Awaiting approval</div>
+          </div>
+          <div class="status-option" data-status="Approved" onclick="selectStatus(this, 'Approved', '#a5d6a7')">
+            <div class="status-option-icon">✓</div>
+            <div class="status-option-title">Approved</div>
+            <div class="status-option-desc">Materials approved</div>
+          </div>
+          <div class="status-option" data-status="Processing" onclick="selectStatus(this, 'Processing', '#90caf9')">
+            <div class="status-option-icon">↻</div>
+            <div class="status-option-title">Processing</div>
+            <div class="status-option-desc">Currently processing</div>
+          </div>
+          <div class="status-option" data-status="Completed" onclick="selectStatus(this, 'Completed', '#ccc')">
+            <div class="status-option-icon">✔️</div>
+            <div class="status-option-title">Completed</div>
+            <div class="status-option-desc">Work completed</div>
+          </div>
+        </div>
+      </div>
+      <div class="info-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <span><strong>Note:</strong> Updating the status will notify relevant team members and update the job order timeline.</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-reset" onclick="closeStatusModal()">Cancel</button>
+      <button class="btn-apply" id="update-status-btn" onclick="updateMaterialStatus()" style="opacity: 0.5; cursor: not-allowed;" disabled>Update Status</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function doLogin() {
+    const pw = document.getElementById('pw-input').value;
+    const err = document.getElementById('login-error');
+    if (pw === 'warehouse123') {
+      document.getElementById('login-page').style.display = 'none';
+      document.getElementById('dashboard-page').style.display = 'block';
+      err.style.display = 'none';
+    } else {
+      err.style.display = 'block';
+    }
+  }
+  document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+  function doLogout() {
+    document.getElementById('dashboard-page').style.display = 'none';
+    document.getElementById('login-page').style.display = 'flex';
+    document.getElementById('pw-input').value = '';
+  }
+
+  function openFilter() { document.getElementById('filter-modal').classList.add('open'); }
+  function closeFilter() { document.getElementById('filter-modal').classList.remove('open'); }
+
+  function toggle(btn, groupId) {
+    document.querySelectorAll('#' + groupId + ' .toggle-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function resetFilters() {
+    document.querySelectorAll('.date-input').forEach(i => i.value = '');
+    ['priority-group','status-group'].forEach(g => {
+      const btns = document.querySelectorAll('#' + g + ' .toggle-btn');
+      btns.forEach(b => b.classList.remove('active'));
+      btns[0].classList.add('active');
+    });
+  }
+
+  document.getElementById('filter-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeFilter();
+  });
+
+  // INBOX & NOTIFICATIONS
+  const messages = [
+    {
+      id: 1,
+      title: 'RE: JO-2026-002 - Material Available',
+      department: 'Warehouse Department',
+      tag: 'JO-2026-002',
+      time: '10 mins ago',
+      body: 'Brake pads for Isuzu D-Max are now in stock. We can proceed with the installation. Estimated completion: 2 days.',
+      read: false,
+      tagColor: '#2e9e3e'
+    },
+    {
+      id: 2,
+      title: 'RE: JO-2026-005 - Battery Order Confirmed',
+      department: 'Warehouse Department',
+      tag: 'JO-2026-005',
+      time: '45 mins ago',
+      body: 'Battery for Nissan Navara has been ordered from supplier. Expected arrival: April 30, 2026. Will notify upon receipt.',
+      read: false,
+      tagColor: '#2e9e3e'
+    },
+    {
+      id: 3,
+      title: 'Job Order JO-2026-001 Completed',
+      department: 'Maintenance Team',
+      tag: 'JO-2026-001',
+      time: '2 hrs ago',
+      body: 'Engine oil change for Toyota Hilux has been completed. Please review and close the job order.',
+      read: false,
+      tagColor: '#1565c0'
+    }
+  ];
+
+  function renderInboxMessages() {
+    const inboxBody = document.getElementById('inbox-body');
+    const showUnreadOnly = document.getElementById('unread-only-btn')?.classList.contains('active-filter');
+    
+    let html = '<div class="inbox-group-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Warehouse Replies (4)</div><div class="inbox-group-sub">Messages from warehouse regarding your job orders</div>';
+    
+    const messagesToShow = showUnreadOnly ? messages.filter(m => !m.read) : messages;
+    
+    messagesToShow.forEach(msg => {
+      const readClass = msg.read ? 'read' : '';
+      const dotClass = msg.read ? 'hidden' : '';
+      html += `
+      <div class="inbox-item ${readClass}" onclick="openMessage(${msg.id})">
+        <div class="inbox-item-top">
+          <div class="inbox-item-title-row">
+            <div class="inbox-dot ${dotClass}"></div>
+            <div class="inbox-item-title">${msg.title}</div>
+          </div>
+          <span class="inbox-item-time">${msg.time}</span>
+        </div>
+        <div class="inbox-item-meta">
+          <span class="inbox-dept">${msg.department}</span>
+          <span class="inbox-mr-tag">${msg.tag}</span>
+        </div>
+        <div class="inbox-item-body">${msg.body}</div>
+      </div>`;
+    });
+    
+    inboxBody.innerHTML = html;
+  }
+
+  function openInbox() {
+    document.getElementById('inbox-panel').classList.add('open');
+    renderInboxMessages();
+  }
+
+  function closeInbox() {
+    document.getElementById('inbox-panel').classList.remove('open');
+    closeMessage();
+  }
+
+  function openMessage(msgId) {
+    const msg = messages.find(m => m.id === msgId);
+    if (!msg) return;
+    
+    const msgBody = document.getElementById('msg-body');
+    let html = `
+      <button class="msg-back" onclick="renderInboxMessages()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Back to inbox</button>
+      <div class="msg-title">${msg.title}</div>
+      <div class="msg-meta-row">
+        <span class="inbox-mr-tag">${msg.tag}</span>
+        <span class="msg-dept">${msg.department}</span>
+      </div>
+      <div class="msg-time">${msg.time}</div>
+      <button class="msg-mark-btn" onclick="toggleReadStatus(${msg.id})">${msg.read ? 'Mark as Unread' : 'Mark as Read'}</button>
+      <div class="msg-content">${msg.body}</div>
+    `;
+    msgBody.innerHTML = html;
+    document.getElementById('message-detail').classList.add('open');
+  }
+
+  function closeMessage() {
+    document.getElementById('message-detail').classList.remove('open');
+  }
+
+  function toggleReadStatus(msgId) {
+    const msg = messages.find(m => m.id === msgId);
+    if (msg) {
+      msg.read = !msg.read;
+      updateUnreadCount();
+      openMessage(msgId);
+    }
+  }
+
+  function updateUnreadCount() {
+    const unreadCount = messages.filter(m => !m.read).length;
+    const badge = document.getElementById('notif-badge');
+    const label = document.getElementById('unread-count-label');
+    
+    if (unreadCount > 0) {
+      badge.textContent = unreadCount;
+      badge.style.display = 'flex';
+    } else {
+      badge.style.display = 'none';
+    }
+    label.textContent = unreadCount > 0 ? `${unreadCount} unread message${unreadCount !== 1 ? 's' : ''}` : 'No unread messages';
+  }
+
+  function markAllRead() {
+    messages.forEach(m => m.read = true);
+    updateUnreadCount();
+    renderInboxMessages();
+  }
+
+  function markAllUnread() {
+    messages.forEach(m => m.read = false);
+    updateUnreadCount();
+    renderInboxMessages();
+  }
+
+  function toggleUnreadOnly() {
+    const btn = document.getElementById('unread-only-btn');
+    btn.classList.toggle('active-filter');
+    renderInboxMessages();
+  }
+
+  // Close inbox when clicking backdrop
+  document.addEventListener('click', function(e) {
+    const inboxPanel = document.getElementById('inbox-panel');
+    if (inboxPanel.classList.contains('open') && 
+        !inboxPanel.contains(e.target) && 
+        !document.getElementById('notif-btn').contains(e.target)) {
+      closeInbox();
+    }
+  });
+
+  // STATUS UPDATE MODAL
+  let currentStatusUpdate = { jobOrderId: null, jobTitle: null, newStatus: null };
+
+  function openStatusModal(jobOrderId, jobTitle, button) {
+    currentStatusUpdate = { jobOrderId, jobTitle, newStatus: null };
+    document.getElementById('status-modal-subtitle').textContent = `${jobOrderId} - ${jobTitle}`;
+    document.getElementById('status-modal').classList.add('open');
+    
+    // Reset status options
+    document.querySelectorAll('.status-option').forEach(opt => opt.classList.remove('selected'));
+    document.getElementById('update-status-btn').disabled = true;
+    document.getElementById('update-status-btn').style.opacity = '0.5';
+    document.getElementById('update-status-btn').style.cursor = 'not-allowed';
+  }
+
+  function closeStatusModal() {
+    document.getElementById('status-modal').classList.remove('open');
+    currentStatusUpdate = { jobOrderId: null, jobTitle: null, newStatus: null };
+  }
+
+  function selectStatus(element, status, color) {
+    // Remove previous selection
+    document.querySelectorAll('.status-option').forEach(opt => opt.classList.remove('selected'));
+    
+    // Add selection to current
+    element.classList.add('selected');
+    currentStatusUpdate.newStatus = status;
+    
+    // Enable update button
+    document.getElementById('update-status-btn').disabled = false;
+    document.getElementById('update-status-btn').style.opacity = '1';
+    document.getElementById('update-status-btn').style.cursor = 'pointer';
+  }
+
+  function updateMaterialStatus() {
+    if (!currentStatusUpdate.newStatus) return;
+
+    const statusClassMap = {
+      Pending: 'status-pending',
+      Approved: 'status-approved',
+      Processing: 'status-processing',
+      Completed: 'status-completed'
+    };
+
+    const card = document.querySelector(`.request-card[data-job-order-id="${currentStatusUpdate.jobOrderId}"]`);
+    if (card) {
+      const badge = card.querySelector('.status-badge');
+      if (badge) {
+        badge.textContent = currentStatusUpdate.newStatus;
+        Object.values(statusClassMap).forEach(cls => badge.classList.remove(cls));
+        badge.classList.add(statusClassMap[currentStatusUpdate.newStatus] || 'status-pending');
+      }
+    }
+
+    closeStatusModal();
+  }
+
+  document.getElementById('status-modal')?.addEventListener('click', function(e) {
+    if (e.target === this) closeStatusModal();
+  });
+
+  // Initialize
+  updateUnreadCount();
+</script>
+</body>
+</html>
